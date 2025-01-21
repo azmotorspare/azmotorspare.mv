@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motor Spare </title>
+  <style>
+    /* General Reset */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #e53935;
+      color: white;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      max-width: 50px; /* Adjust size of the logo */
+      height: auto;
+      margin-right: 15px; /* Space between logo and text */
+    }
+
+    .header-text {
+      font-size: 28px; /* Increase font size for better visibility */
+      font-weight: bold;
+      text-transform: uppercase; /* Capitalize the text */
+    }
+
+    /* Filter Section */
+    .filter {
+      background-color: #fff;
+      padding: 10px;
+      margin-bottom: 20px;
+      position: sticky;
+      top: 70px; /* Adjust this if needed to keep the filter below the header */
+      z-index: 9; /* Keep it below the header */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
+    }
+
+    .filter label {
+      font-size: 16px;
+      margin-right: 10px;
+    }
+
+    .filter select {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    /* Product Container */
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 15px;
+      justify-content: center;
+    }
+
+    .product {
+      width: 90%;
+      max-width: 250px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      padding: 15px;
+      position: relative; /* For positioning "Hot Sale" badge */
+      overflow: hidden;
+    }
+
+    /* Hot Sale Badge */
+    .hot-sale {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #ff1744;
+      color: white;
+      padding: 5px 15px;
+      font-size: 14px;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 1;
+    }
+    
+
+    .product img {
+      width: 100%;
+      height: 200px; /* Ensures consistent height for all images */
+      object-fit: cover; /* Maintains aspect ratio and fills the container */
+      object-position: center; /* Centers the image */
+      border-radius: 5px;
+    }
+
+    .product h3 {
+      font-size: 18px;
+      color: #e53935;
+      margin-top: 10px;
+    }
+
+    .product .price {
+      font-size: 16px;
+      color: #333;
+      text-decoration: line-through;
+    }
+
+    .product .discount-price {
+      font-size: 18px;
+      color: #e53935;
+    }
+
+    .product .cart-actions {
+      margin-top: 10px;
+    }
+
+    .product .cart-actions input {
+      width: 50px;
+      padding: 5px;
+      text-align: center;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+
+    .product .out-of-stock {
+      background-color: #f44336;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .product.hot {
+      background-color: #ffebee; /* Light red background for Hot Sale */
+    }
+
+    .button {
+      background-color: #e53935;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    .button:hover {
+      background-color: #d32f2f;
+    }
+
+    .button:disabled {
+      background-color: #c1c1c1;
+      cursor: not-allowed;
+    }
+
+    /* Cart Section */
+    .cart-icon {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      font-size: 30px;
+      background-color: #e53935;
+      color: white;
+      border-radius: 50%;
+      padding: 15px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .cart {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 80%;
+      max-width: 300px;
+      background-color: white;
+      box-shadow: -4px 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: none;
+      z-index: 999;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .cart ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .cart ul li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .cart-total {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .cart button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 18px;
+      width: 100%;
+    }
+
+    /* Invoice Style */
+    .invoice-container {
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 20px auto;
+    }
+
+    .invoice-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .invoice-list li {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .bank-transfer {
+      margin-top: 30px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    #account-number {
+      font-weight: bold;
+      color: black;
+      cursor: pointer;
+    }
+
+    .bank-details {
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 14px;
+      color: #555;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .copy-button {
+      cursor: pointer;
+      background-color: #ddd;
+      color: #333;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* Mobile-Specific Styles */
+    @media (max-width: 768px) {
+      .product {
+        width: 95%;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+
+      .cart-icon {
+        right: 10px;
+        top: 10px;
+      }
+
+      .cart {
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .button {
+        font-size: 14px;
+        padding: 8px;
+      }
+
+      .cart-total {
+        font-size: 16px;
+      }
+
+      .invoice-container {
+        width: 95%;
+        max-width: 90%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        font-size: 18px;
+        padding: 10px 0;
+      }
+
+      .product h3 {
+        font-size: 16px;
+      }
+
+      .product .price, .product .discount-price {
+        font-size: 14px;
+      }
+
+      .cart button {
+        font-size: 16px;
+      }
+
+      .invoice-container {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header> <div class="logo">
+  <img src="AZ.png" alt="Logo"> <!-- Your logo image -->
+  <span class="header-text">AZ Motor Spare</span>
+</div></header>
+
+<div class="filter">
+  <label for="productFilter">Filter by Product Name:</label>
+  <select id="productFilter" onchange="filterProducts()">
+    <option value="all">All</option>
+    <option value="Brake Pads">Brake Pads</option>
+    <option value="Oil Filter">Oil Filter</option>
+    <option value="Air Filter">Air Filter</option>
+    <option value="Timing Belt">Timing Belt</option>
+    <option value="Radiator Fan">Radiator Fan</option>
+    <option value="Brake Disc">Brake Disc</option>
+    <option value="Clutch Kit">Clutch Kit</option>
+    <option value="Suspension Kit">Suspension Kit</option>
+    <option value="Fuel Pump">Fuel Pump</option>
+    <option value="Starter Motor">Starter Motor</option>
+  </select>
+</div>
+
+<div class="container" id="product-container">
+  <!-- Products here -->
+  <div class="product" data-name="Brake Pads">
+    <img src="AlloyBarBlack.jpg" alt="Brake Pads">
+    <h3>Brake Pads</h3>
+    <p class="price">MVR 250.00</p>
+    <p class="discount-price">MVR 200.00</p>
+    <div class="cart-actions">
+      <input type="number" value="1" min="1" id="qty1">
+      <button class="button" onclick="addToCart(1, 'Brake Pads', 200, 250)">Add to Cart</button>
+    </div>
+  </div>
+
+  <div class="product out-of-stock" data-name="Oil Filter">
+    <img src="AlloyBarBlack.jpg" alt="Oil Filter">
+    <h3>Oil Filter</h3>
+    <p class="price">MVR 100.00</p>
+    <p class="discount-price">MVR 80.00</p>
+    <p class="out-of-stock">Out of Stock</p>
+    <div class="cart-actions">
+      <input type="number" value="1" min="1" id="qty2" disabled>
+      <button class="button" disabled>Add to Cart</button>
+    </div>
+  </div>
+  <div class="container" id="product-container">
+    <!-- Hot Sale Product -->
+    <div class="product hot" data-name="Brake Pads">
+      <div class="hot-sale">Hot Sale</div>
+      <img src="GN125DigitalMeter.jpg" alt="Brake Pads">
+      <h3>Brake Pads</h3>
+      <p class="price">MVR 250.00</p>
+      <p class="discount-price">MVR 200.00</p>
+      <div class="cart-actions">
+        <input type="number" value="1" min="1" id="qty1">
+        <button class="button" onclick="addToCart(1, 'Brake Pads', 200, 250)">Add to Cart</button>
+      </div>
+    </div>
+  
+    <!-- Out of Stock Product -->
+    <div class="product out-of-stock" data-name="Oil Filter">
+      <img src="SideMirrorRectangleBlack.jpg" alt="Oil Filter">
+      <h3>Oil Filter</h3>
+      <p class="price">MVR 100.00</p>
+      <p class="discount-price">MVR 80.00</p>
+      <div class="cart-actions">
+        <input type="number" value="1" min="1" id="qty2">
+        <button class="button" disabled>Out of Stock</button>
+      </div>
+    </div>
+    <div class="container" id="product-container">
+      <!-- Hot Sale Product -->
+      <div class="product hot" data-name="Brake Pads">
+        <div class="hot-sale">Hot Sale</div>
+        <img src="SideMirrorRectangleBlack.jpg" alt="Brake Pads">
+        <h3>Brake Pads</h3>
+        <p class="price">MVR 250.00</p>
+        <p class="discount-price">MVR 200.00</p>
+        <div class="cart-actions">
+          <input type="number" value="1" min="1" id="qty1">
+          <button class="button" onclick="addToCart(1, 'Brake Pads', 200, 250)">Add to Cart</button>
+        </div>
+      </div>
+    
+      <!-- Out of Stock Product -->
+      <div class="product out-of-stock" data-name="Oil Filter">
+        <img src="Signal Light.jpg" alt="Oil Filter">
+        <h3>Oil Filter</h3>
+        <p class="price">MVR 100.00</p>
+        <p class="discount-price">MVR 80.00</p>
+        <div class="cart-actions">
+          <input type="number" value="1" min="1" id="qty2">
+          <button class="button" disabled>Out of Stock</button>
+        </div>
+      </div>
+    
+      <!-- New Product 1: Air Filter -->
+      <div class="product" data-name="Air Filter">
+        <img src="MotorcycleSideMirrorBlack.jpg" alt="Air Filter">
+        <h3>Air Filter</h3>
+        <p class="price">MVR 120.00</p>
+        <p class="discount-price">MVR 100.00</p>
+        <div class="cart-actions">
+          <input type="number" value="1" min="1" id="qty3">
+          <button class="button" onclick="addToCart(3, 'Air Filter', 100, 120)">Add to Cart</button>
+        </div>
+      </div>
+    
+      <!-- New Product 2: Timing Belt -->
+      <div class="product" data-name="Timing Belt">
+        <img src="MotorcycleSideMirrorRed.jpg" alt="Timing Belt">
+        <h3>Timing Belt</h3>
+        <p class="price">MVR 450.00</p>
+        <p class="discount-price">MVR 400.00</p>
+        <div class="cart-actions">
+          <input type="number" value="1" min="1" id="qty4">
+          <button class="button" onclick="addToCart(4, 'Timing Belt', 400, 450)">Add to Cart</button>
+        </div>
+      </div>
+    
+      <!-- New Product 3: Radiator Fan -->
+      <div class="product" data-name="Radiator Fan">
+        <img src="SideMirrorRectangleCarbon.jpg" alt="Radiator Fan">
+        <h3>Radiator Fan</h3>
+        <p class="price">MVR 350.00</p>
+        <p class="discount-price">MVR 300.00</p>
+        <div class="cart-actions">
+          <input type="number" value="1" min="1" id="qty5">
+          <button class="button" onclick="addToCart(5, 'Radiator Fan', 300, 350)">Add to Cart</button>
+        </div>
+      </div>
+
+  <!-- Add more products here as needed -->
+</div>
+
+<div id="cart" class="cart">
+  <ul id="cart-list"></ul>
+  <p class="cart-total">Total: MVR 0.00</p>
+  <button class="button" onclick="checkout()">Checkout</button>
+</div>
+
+<span class="cart-icon" onclick="toggleCart()">🛒</span>
+
+<script>
+  let cart = [];
+
+  // Filter products by name
+  function filterProducts() {
+    const filterValue = document.getElementById('productFilter').value;
+    const products = document.querySelectorAll('.product');
+    products.forEach(product => {
+      const productName = product.getAttribute('data-name');
+      if (filterValue === 'all' || productName === filterValue) {
+        product.style.display = 'block';
+      } else {
+        product.style.display = 'none';
+      }
+    });
+  }
+
+  function addToCart(productId, productName, productPrice, originalPrice) {
+    const qty = document.getElementById(`qty${productId}`).value;
+    const totalPrice = productPrice * qty;
+    cart.push({ productName, productPrice, qty, totalPrice });
+    updateCart();
+  }
+
+  function updateCart() {
+    const cartList = document.getElementById('cart-list');
+    const cartTotal = document.querySelector('.cart-total');
+    cartList.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `${item.productName} - MVR ${item.totalPrice} (Qty: ${item.qty})`;
+      cartList.appendChild(li);
+      total += item.totalPrice;
+    });
+
+    cartTotal.innerHTML = `Total: MVR ${total.toFixed(2)}`;
+  }
+
+  function toggleCart() {
+    const cartElement = document.getElementById('cart');
+    cartElement.style.display = cartElement.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function generateInvoice() {
+    const invoiceList = document.getElementById('invoice-list');
+    let totalAmount = 0;
+
+    cart.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `${item.productName} - MVR ${item.totalPrice} (Qty: ${item.qty})`;
+      invoiceList.appendChild(li);
+      totalAmount += item.totalPrice;
+    });
+
+    document.getElementById('total-amount').innerText = `Total Amount: MVR ${totalAmount.toFixed(2)}`;
+  }
+
+  function copyAccountNumber() {
+    const accountNumber = document.getElementById('account-number').innerText.replace("Account Number: ", "");
+    navigator.clipboard.writeText(accountNumber).then(() => {
+      alert('Account number copied!');
+    }).catch(err => {
+      alert('Failed to copy account number: ' + err);
+    });
+  }
+
+  function checkout() {
+    let invoiceContent = '<!DOCTYPE html>';
+    invoiceContent += '<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Invoice</title><style>body { font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;} h2 { text-align: center; color: #e53935; } .invoice-container { padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width: 800px; margin: 20px auto;} .invoice-list { list-style-type: none; padding: 0;} .invoice-list li { padding: 10px; border-bottom: 1px solid #ccc;} .bank-transfer { margin-top: 30px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);} .bank-details { border: 1px solid #ccc; padding: 10px; font-size: 14px; color: #555; margin-top: 10px; border-radius: 5px;} .button { background-color: #e53935; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; font-size: 16px;} .button:hover { background-color: #d32f2f;} .logo { text-align: center; } .logo img { max-width: 150px; height: auto; }</style></head><body>';
+  
+    invoiceContent += '<div class="invoice-container">';
+    invoiceContent += '<div class="logo">';
+      invoiceContent += '<img src="AZ.png" alt="Company Logo">'; 
+    invoiceContent += '</div>';
+
+    invoiceContent += '<h2>Invoice</h2>';
+    invoiceContent += '<ul class="invoice-list">';
+
+    let totalAmount = 0;
+
+    cart.forEach(item => {
+      invoiceContent += `<li>${item.productName} - MVR ${item.totalPrice} (Qty: ${item.qty})</li>`;
+      totalAmount += item.totalPrice;
+    });
+
+    invoiceContent += '</ul>';
+
+    invoiceContent += '<div class="bank-transfer">';
+    invoiceContent += '<h3>Bank Transfer Details</h3>';
+    invoiceContent += '<div class="bank-details">';
+    invoiceContent += '<p>Bank Name: LAST HUNT</p>';
+    invoiceContent += '<p id="account-number" onclick="copyAccountNumber()" style="font-weight: bold; color: black;">Account Number: 7730000345836</p>';
+    invoiceContent += '<p>BML</p>';
+    invoiceContent += '<p>Viber:9131220</p>';
+    invoiceContent += '</div>';
+    invoiceContent += '</div>';
+
+    invoiceContent += `<h3>Total Amount: MVR ${totalAmount.toFixed(2)}</h3>`;
+    invoiceContent += '<button class="button" onclick="window.close()">Close</button>';
+    invoiceContent += '</div></body></html>';
+
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(invoiceContent);
+    newWindow.document.close();
+  }
+
+  // Call the function to generate invoice when the page loads
+  generateInvoice();
+</script>
+
+</body>
+</html>
