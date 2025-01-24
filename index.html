@@ -126,6 +126,19 @@
             font-size: 0.8em;
             border-radius: 5px;
         }
+        .tag {
+    background-color: #f0f0f0; /* Default background for tags */
+    color: #333; /* Default text color */
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.tag.new-stock {
+    background-color: green;
+    color: white;
+}
+
 
         .product-name {
             margin: 10px 0;
@@ -292,7 +305,7 @@
 <body>
 
 <header>
-    <h1>E-Commerce Shop</h1>
+    <h1>AZ Motor Spare</h1>
     <div class="cart-icon" onclick="toggleCart()">
         <i class="fas fa-shopping-cart"></i>
         <span id="cartCount">0</span>
@@ -335,9 +348,9 @@
 <script>
     const products = [
         { id: 1, name: 'GN125 Digital Meter', price: 1500, discountPrice: 1200, images: ['GN125DigitalMeter.jpg', '5.jpg', '2.jpg'], status: 'in-stock', tags: ['Hot Sale'] },
-        { id: 2, name: 'Mirror Motor Bike', price: 250, discountPrice: 200, images: ['https://via.placeholder.com/253', 'https://via.placeholder.com/254', 'https://via.placeholder.com/255'], status: 'out-of-stock', tags: ['New Stock'] },
-        { id: 3, name: 'Brake Pad', price: 350, discountPrice: 300, images: ['https://via.placeholder.com/259', 'https://via.placeholder.com/260', 'https://via.placeholder.com/261'], status: 'in-stock', tags: [] },
-        { id: 4, name: 'Motor Oil', price: 450, discountPrice: 400, images: ['https://via.placeholder.com/262', 'https://via.placeholder.com/263', 'https://via.placeholder.com/264'], status: 'in-stock', tags: ['Hot Sale'] },
+        { id: 2, name: 'Universal Alloy Bar End - Red', price: 350, discountPrice: 300, images: ['AlloyBarRed.jpg', 'Universal Enbar RED 01.jpg', 'Universal Enbar RED 02.jpg'], status: 'in-stock', tags: ['New Stock'] },
+        { id: 3, name: 'Universal Alloy Bar End - Black', price: 350, discountPrice: 300, images: ['AlloyBarBlack.jpg', 'Universal Enbar RED 01.jpg', 'Universal Enbar RED 02.jpg'], status: 'in-stock', tags: ['Hot Sale'] },
+        { id: 4, name: 'Universal Side Mirror - Black', price: 450, discountPrice: 395, images: ['MotorcycleSideMirrorBlack.jpg', 'Universal Side Mirror Handlebar End.jpg', 'MotorcycleSideMirrorBlack.jpg'], status: 'in-stock', tags: ['Hot Sale'] },
         { id: 5, name: 'Shock Absorber', price: 500, discountPrice: 450, images: ['https://via.placeholder.com/265', 'https://via.placeholder.com/266', 'https://via.placeholder.com/267'], status: 'in-stock', tags: ['New Stock'] },
         { id: 6, name: 'Clutch Plate', price: 600, discountPrice: 500, images: ['https://via.placeholder.com/268', 'https://via.placeholder.com/269', 'https://via.placeholder.com/270'], status: 'out-of-stock', tags: [] },
         { id: 7, name: 'Car Battery', price: 700, discountPrice: 650, images: ['https://via.placeholder.com/271', 'https://via.placeholder.com/272', 'https://via.placeholder.com/273'], status: 'in-stock', tags: ['Hot Sale'] },
@@ -357,24 +370,24 @@
     const nameFilterDropdown = document.getElementById('nameFilterDropdown');
 
     function renderProducts(filteredProducts = products) {
-        productsContainer.innerHTML = filteredProducts.map(product => `
-            <div class="product">
-                <img id="mainImage${product.id}" class="main-product-image" src="${product.images[0]}" alt="${product.name}">
-                <div class="product-images">
-                    <img src="${product.images[0]}" alt="${product.name}" onclick="changeImage(${product.id}, 0)">
-                    <img src="${product.images[1]}" alt="${product.name}" onclick="changeImage(${product.id}, 1)">
-                    <img src="${product.images[2]}" alt="${product.name}" onclick="changeImage(${product.id}, 2)">
-                </div>
-                ${product.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                <div class="product-name">${product.name}</div>
-                <div class="price">
-                    <span class="discount-price">${product.price} MVR</span>
-                    ${product.price - product.discountPrice > 0 ? `<span>${product.discountPrice} MVR</span>` : ''}
-                </div>
-                <button class="add-to-cart" onclick="addToCart(${product.id})">${product.status === 'out-of-stock' ? 'Out of Stock' : 'Add to Cart'}</button>
+    productsContainer.innerHTML = filteredProducts.map(product => `
+        <div class="product">
+            <img id="mainImage${product.id}" class="main-product-image" src="${product.images[0]}" alt="${product.name}">
+            <div class="product-images">
+                <img src="${product.images[0]}" alt="${product.name}" onclick="changeImage(${product.id}, 0)">
+                <img src="${product.images[1]}" alt="${product.name}" onclick="changeImage(${product.id}, 1)">
+                <img src="${product.images[2]}" alt="${product.name}" onclick="changeImage(${product.id}, 2)">
             </div>
-        `).join('');
-    }
+            ${product.tags.map(tag => `<span class="tag ${tag === 'New Stock' ? 'new-stock' : ''}">${tag}</span>`).join('')}
+            <div class="product-name">${product.name}</div>
+            <div class="price">
+                <span class="discount-price">${product.price} MVR</span>
+                ${product.price - product.discountPrice > 0 ? `<span>${product.discountPrice} MVR</span>` : ''}
+            </div>
+            <button class="add-to-cart" onclick="addToCart(${product.id})">${product.status === 'out-of-stock' ? 'Out of Stock' : 'Add to Cart'}</button>
+        </div>
+    `).join('');
+}
 
     function changeImage(productId, imageIndex) {
         const product = products.find(product => product.id === productId);
