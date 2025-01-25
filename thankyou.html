@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body {
+            background-color: #2C2C2C;
+            font-family: Arial, sans-serif;
+            color: #FFF;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #B30000;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        .highlight {
+            color: #B30000;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            background-color: #B30000;
+            color: white;
+            text-align: center;
+            display: block;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #D32F2F;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Thank You for Your Order!</h1>
+
+        <p><strong>Product Name:</strong> <span id="product-name"></span></p>
+        <p><strong>Order Date:</strong> <span id="select-date"></span></p>
+        <p><strong>Customer Name:</strong> <span id="customer-name"></span></p>
+        <p><strong>Contact:</strong> <span id="customer-contact"></span></p>
+        <p><strong>Uploaded File:</strong> <span id="upload-file"></span></p>
+
+        <a href="index.html" class="back-button">Go Back</a>
+    </div>
+
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database.js"></script>
+
+    <script>
+        // Firebase configuration (use same config as in index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtH6EO1LrN1Xm4N9j9XTnRGi5cfdSphkA",
+            authDomain: "preordersrequest.firebaseapp.com",
+            databaseURL: "https://preordersrequest-default-rtdb.firebaseio.com",
+            projectId: "preordersrequest",
+            storageBucket: "preordersrequest.firebasestorage.app",
+            messagingSenderId: "1099488620123",
+            appId: "1:1099488620123:web:5c9ed88aa9a12e6f4dd97e",
+            measurementId: "G-9F4C3YH54Q"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        window.onload = function() {
+            // Assuming the order ID is passed in the URL, like thankyou.html?id=<order_id>
+            const orderId = new URLSearchParams(window.location.search).get('id');
+            const orderRef = database.ref('orders/' + orderId);
+
+            orderRef.once('value').then(function(snapshot) {
+                const orderData = snapshot.val();
+
+                if (orderData) {
+                    document.getElementById('product-name').textContent = orderData.productName;
+                    document.getElementById('select-date').textContent = orderData.selectDate;
+                    document.getElementById('customer-name').textContent = orderData.customerName;
+                    document.getElementById('customer-contact').textContent = orderData.customerContact;
+                    document.getElementById('upload-file').textContent = orderData.uploadFileName;
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
