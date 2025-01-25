@@ -20,11 +20,35 @@
         header {
             background-color: #333;
             color: white;
-            padding: 15px;
-            text-align: center;
-            position: relative;
-            z-index: 100;
+            display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #333;
         }
+        .logo-container {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.company-logo {
+    max-width: 200px; /* Adjust the size as needed */
+    height: auto;
+    animation: zoomEffect 3s infinite ease-in-out;
+}
+
+@keyframes zoomEffect {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+ 
+
+        
 
         .cart-icon {
             position: absolute;
@@ -32,7 +56,19 @@
             right: 15px;
             font-size: 1.5em;
             cursor: pointer;
+            display: flex;
+            align-items: center
         }
+        .company-logo {
+    width: 20px;
+    height: auto;
+}
+
+h1 {
+    flex: 1;
+    text-align: center;
+    margin: 0;
+}
 
         .cart-icon span {
             position: absolute;
@@ -400,14 +436,23 @@ button:hover {
 </head>
 <body>
 
-<header>
-    <h1>AZ Motor Spare</h1>
-    <div class="cart-icon" onclick="toggleCart()">
-        <i class="fas fa-shopping-cart"></i>
-        <span id="cartCount">0</span>
-    </div>
-</header>
+    <header>
+        
+        <h1>
+            <img src="AZ.png" alt="Company Logo" class="company-logo" style="width:40px; height: auto;">
+            Motor Spare
+        </h1>
+        
+        <div class="cart-icon" onclick="toggleCart()">
+            <i class="fas fa-shopping-cart"></i>
+            <span id="cartCount">0</span>
+        </div>
+    </header>
 
+
+<div class="logo-container">
+   
+</div>
 <div class="filter-container">
     <select id="filterDropdown" onchange="filterProducts()">
         <option value="all">All Products</option>
