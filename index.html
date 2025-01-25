@@ -174,36 +174,95 @@
     height: auto;
     border-radius: 10px;
 }
-#modalProductDescription {
-    text-align: justify;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    width: 80%;
-    max-width: 400px;
-    position: relative;
-}
-
-.modal {
+/* Modal Styling */
+#descriptionModal {
     display: none;
     position: fixed;
-    z-index: 1000;
+    z-index: 1;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto; /* Enable scrolling if needed */
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 90%;
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+}
+
+.image-slider {
+    position: relative;
+    width: 100%;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
-.close {
-    float: right;
-    cursor: pointer;
+
+.modal-product-image {
+    width: 100%; /* Make images responsive */
+    height: 300px; /* Set a fixed height for consistency */
+    object-fit: cover; /* Ensure images fill the dimensions without distortion */
+    display: none; /* Hide all images initially */
 }
+
+.modal-product-image:first-child {
+    display: block; /* Show the first image initially */
+}
+
+.slider-controls {
+    margin: 10px 0;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: #fff;
+    font-size: 16px;
+    margin: 0 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.description {
+    margin-top: 15px;
+    text-align: justify;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .modal-product-image {
+        height: 200px; /* Reduce height for smaller screens */
+    }
+
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+}
+
 
         .add-to-cart:hover {
             background-color: #0056b3;
@@ -368,14 +427,23 @@
 
 <div class="products-container" id="productsContainer"></div>
 
-<div id="descriptionModal" class="modal">
+<div id="descriptionModal" style="display:none;">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img id="modalProductImage" class="modal-product-image" src="" alt="Product Image">
+        <span onclick="closeModal()" class="close">&times;</span>
         <h2 id="modalProductName"></h2>
-        <p id="modalProductDescription"></p>
+        <div class="image-slider">
+            <img id="modalProductImage1" class="modal-product-image" />
+            <img id="modalProductImage2" class="modal-product-image" />
+            <img id="modalProductImage3" class="modal-product-image" />
+        </div>
+        <div class="slider-controls">
+            <button onclick="prevImage()">Prev</button>
+            <button onclick="nextImage()">Next</button>
+        </div>
+        <div id="modalProductDescription" class="description"></div>
     </div>
 </div>
+
 
 
 <div class="cart-sidebar" id="cartSidebar">
@@ -698,17 +766,51 @@
 </script>
 
  <script>
-    function showDescription(productId) {
+   let currentImageIndex = 0;
+
+function showDescription(productId) {
     const product = products.find(product => product.id === productId);
     document.getElementById('modalProductName').textContent = product.name;
-    document.getElementById('modalProductDescription').textContent = product.description;
-    document.getElementById('modalProductDescription').style.textAlign = 'justify';  // Justify the text
-    document.getElementById('modalProductImage').src = product.images[0]; // Display the first image of the product
+
+    // Justify and add the product description below the images
+    const descriptionElement = document.getElementById('modalProductDescription');
+    descriptionElement.textContent = product.description;
+    descriptionElement.style.textAlign = 'justify';
+
+    // Show images in the slider
+    const images = product.images;
+    document.getElementById('modalProductImage1').src = images[0];
+    document.getElementById('modalProductImage2').src = images[1];
+    document.getElementById('modalProductImage3').src = images[2];
+
+    // Ensure only the first image is visible initially
+    document.getElementById('modalProductImage1').style.display = 'block';
+    document.getElementById('modalProductImage2').style.display = 'none';
+    document.getElementById('modalProductImage3').style.display = 'none';
+
+    // Reset current image index
+    currentImageIndex = 0;
+
+    // Display modal
     document.getElementById('descriptionModal').style.display = 'flex';
 }
 
 function closeModal() {
     document.getElementById('descriptionModal').style.display = 'none';
+}
+
+function prevImage() {
+    const images = document.querySelectorAll('.modal-product-image');
+    images[currentImageIndex].style.display = 'none';
+    currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+    images[currentImageIndex].style.display = 'block';
+}
+
+function nextImage() {
+    const images = document.querySelectorAll('.modal-product-image');
+    images[currentImageIndex].style.display = 'none';
+    currentImageIndex = (currentImageIndex + 1) % images.length;
+    images[currentImageIndex].style.display = 'block';
 }
 
 
