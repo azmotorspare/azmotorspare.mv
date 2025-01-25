@@ -398,7 +398,7 @@ button:hover {
         }
 
         .checkout-btn {
-            background-color: #28a745;
+            background-color: #670c04;
             color: white;
             padding: 10px;
             border: none;
@@ -411,7 +411,7 @@ button:hover {
         }
 
         .checkout-btn:hover {
-            background-color: #218838;
+            background-color: #1a1c1a;
         }
 
         /* Small Image Styling */
@@ -432,6 +432,56 @@ button:hover {
         .product-images img:hover {
             border: 2px solid #007BFF;
         }
+
+        /* Sidebar styles */
+    .sidebar {
+      height: 100vh;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      background-color: #4b4a4a; /* Grey color */
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 20px;
+    }
+
+    .sidebar a {
+      padding: 10px 20px;
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      display: block;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #2a2929;
+    }
+
+    .open-btn {
+      font-size: 28px;
+      padding: 10px;
+      position: fixed;
+      background: none;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 20px;
+      cursor: pointer;
+      color: white;
+      background: none;
+      border: none;
+    }
+
+    
+
+    /* Active state for sidebar */
+    .sidebar.active {
+      left: 0;
+    }
     </style>
 </head>
 <body>
@@ -488,7 +538,20 @@ button:hover {
         <div id="modalProductDescription" class="description"></div>
     </div>
 </div>
+<button class="open-btn" onclick="toggleSidebar()">☰</button>
 
+<div class="sidebar" id="sidebar">
+  <button class="close-btn" onclick="toggleSidebar()">&times;</button>
+  <a href="index.html">Products</a>
+  <a href="About.html">About</a>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+  }
+</script>
 
 
 <div class="cart-sidebar" id="cartSidebar">
@@ -501,9 +564,7 @@ button:hover {
     <button class="checkout-btn" onclick="goToCheckout()">Proceed to Checkout</button>
 </div>
 
-<div class="footer">
-    <p>Contact: 9131220 | Email: ahmedvasym@gmail.com</p>
-</div>
+
 
 <script>
     const products = [
