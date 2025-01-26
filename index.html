@@ -578,6 +578,8 @@ button:hover {
 <div class="sidebar" id="sidebar">
     <button class="close-btn" onclick="toggleSidebar()">&times;</button>
     <a href="index.html">Products</a>
+    <a href="Pre.html">Request Any Orders</a>
+    <a href="#" onclick="checkPassword()">Data</a> 
     <a href="About.html">About</a>
     
     <div class="coming-soon">
@@ -587,8 +589,12 @@ button:hover {
         <img src="e45bf45b-1268-49a4-b887-bc306e7029e1.d5926c9b434a048406c6056e5a336b05.jpeg" alt="Product 2" class="product-image">
         <img src="my-11134207-7r98x-ltoqjo738ytqc8.jpeg" alt="Product 3" class="product-image">
       </div>
+      
     </div>
+    
   </div>
+
+  
 
 <script>
   function toggleSidebar() {
@@ -980,6 +986,16 @@ function nextImage() {
 }
 
 
+ </script>
+ <script>
+    function checkPassword() {
+        var password = prompt("Data Page Acess Only AZ MOTOR SPARE:");
+        if (password === "Lasthunt@2014") {
+            window.location.href = "viewData.html"; // Redirect to About page if correct password
+        } else {
+            alert("Incorrect password. Please try again.");
+        }
+    }
  </script>
 
 </body>
