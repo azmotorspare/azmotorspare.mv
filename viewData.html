@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Pre-Order Data</title>
+    <style>
+        body {
+            background-color: #2b2b2b;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        h1 {
+            color: #b22222;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-weight: bold;
+            text-align: left;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logos {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .logos img {
+            max-width: 100px;
+            max-height: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #1e1e1e;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #555;
+            text-align: left;
+        }
+
+        th {
+            background-color: #b22222;
+        }
+
+        tr:hover {
+            background-color: #333;
+        }
+
+        a {
+            color: #b22222;
+            text-decoration: none;
+        }
+
+        .delete-button {
+            background-color: #b22222;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #8b1e1e;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCtH6EO1LrN1Xm4N9j9XTnRGi5cfdSphkA",
+            authDomain: "preordersrequest.firebaseapp.com",
+            databaseURL: "https://preordersrequest-default-rtdb.firebaseio.com",
+            projectId: "preordersrequest",
+            storageBucket: "preordersrequest.firebaseapp.com",
+            messagingSenderId: "1099488620123",
+            appId: "1:1099488620123:web:5c9ed88aa9a12e6f4dd97e",
+            measurementId: "G-9F4C3YH54Q"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Fetch data from Firebase and display it
+        window.onload = function () {
+            const tableBody = document.getElementById('dataBody');
+            firebase.database().ref('preorders').on('value', (snapshot) => {
+                tableBody.innerHTML = ''; // Clear existing rows
+                const data = snapshot.val();
+                for (let key in data) {
+                    const row = data[key];
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.date || 'N/A'}</td>
+                        <td>${row.productName || 'N/A'}</td>
+                        <td>${row.customerName || 'N/A'}</td>
+                        <td>${row.customerContact || 'N/A'}</td>
+                        <td>
+                            <a href="${row.productLink || '#'}" target="_blank">${row.productLink ? 'View Product' : 'N/A'}</a>
+                        </td>
+                        <td>
+                            <button class="delete-button" onclick="deleteData('${key}')">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                }
+            });
+        };
+
+        // Function to delete a specific pre-order from Firebase
+        function deleteData(key) {
+            if (confirm("Are you sure you want to delete this pre-order?")) {
+                firebase.database().ref('preorders/' + key).remove()
+                    .then(() => {
+                        alert("Pre-order deleted successfully!");
+                    })
+                    .catch((error) => {
+                        alert("Error deleting pre-order: " + error.message);
+                    });
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Pre-Order Requests</h1>
+        <p class="subtitle">Order Only Motor Spare Parts</p> <!-- This is the added bold text -->
+
+        <!-- Logos of Lazada, Shein, and Shopee -->
+        <div class="logos">
+            <img src="https://freepnglogo.com/images/all_img/1701498708lazada-png-logo.png" alt="Lazada Logo">
+            <img src="https://freepnglogo.com/images/all_img/1727674497_logo-shopee-png.png" alt="Shein Logo">
+            <img src="https://logolook.net/wp-content/uploads/2022/04/Shein-Logo.png" alt="Shopee Logo">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product Name</th>
+                    <th>Customer Name</th>
+                    <th>Contact</th>
+                    <th>Product Link</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="dataBody">
+                <!-- Data will be inserted here -->
+            </tbody>
+        </table>
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="index.html">Back to Submit Page</a>
+        </p>
+    </div>
+</body>
+</html>
