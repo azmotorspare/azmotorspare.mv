@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZ Motor Spare Delivery Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #2c2c2c;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+    .progress-bar {
+      height: 10px;
+      background-color: #b30000;
+      border-radius: 5px;
+      margin-top: 10px;
+      transition: background-color 0.3s ease, width 0.3s ease;
+    }
+    .card.complete .progress-bar {
+      background-color: #00ff00;
+    }
+    .complete-text {
+      color: #00ff00;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .container {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            margin-top: 05px;
+            background-color: #444; /* Dark grey track */
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .track {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background-color: #333; /* Darker grey for track */
+            border-radius: 25px;
+            margin-top: 50px;
+        }
+
+        .package {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #e74c3c, #c0392b); /* Dark red package */
+            border-radius: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .person-icon {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 50px;
+            color: #16a085; /* Greenish color for the person */
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #555; /* Dark grey progress bar */
+            height: 5px;
+            margin-top: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .progress {
+            background-color: #e74c3c; /* Dark red progress */
+            height: 100%;
+            width: 0%;
+            border-radius: 5px;
+        }
+
+        .delivery-complete {
+            display: none;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2ecc71; /* Green for completion */
+        }
+
+        .percentage {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #e74c3c; /* Dark red percentage text */
+        }
+        .topper-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2ecc71; /* Greenish color for completion text */
+            margin-top: 20px;
+            display: none; /* Hidden initially */
+        }
+
+
+  </style>
+</head>
+<body>
+  
+  <h2>AZ Motor Spare Delivery - Dashboard</h2>
+  <div class="topper-text">100% - Delivery is Complete</div>
+  <div class="container">
+    <div class="track"></div>
+    <div class="package">📦</div>
+    <div class="person-icon">🚶‍♂️</div>
+</div>
+<div class="progress-bar">
+    <div class="progress"></div>
+</div>
+<div class="percentage">Delivery in Progress: 0%</div>
+<div class="delivery-complete">Delivery Complete</div>
+
+  <div class="dashboard" id="dashboard"></div>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAmy836Pc3NBJfqv7ovKeLuXEroEKKljes",
+      authDomain: "delivery-d07af.firebaseapp.com",
+      databaseURL: "https://delivery-d07af-default-rtdb.firebaseio.com",
+      projectId: "delivery-d07af",
+      storageBucket: "delivery-d07af.appspot.com",
+      messagingSenderId: "18177223806",
+      appId: "1:18177223806:web:e09f3abf45b6d25fc2fc2f",
+      measurementId: "G-V7TC88WW4L"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const dashboard = document.getElementById('dashboard');
+
+    // Listen to Firebase database updates
+    firebase.database().ref('deliveries').on('value', (snapshot) => {
+      dashboard.innerHTML = ''; // Clear the dashboard before appending cards
+
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val(); // Get data for each delivery
+        const progress = data.progress || 0; // Ensure progress is a valid number
+        const isComplete = progress === 100;
+
+        // Determine progress bar color
+        let progressColor = '#b30000'; // Default red
+        if (progress === 100) progressColor = '#00ff00'; // Light green
+        else if (progress >= 75) progressColor = '#006400'; // Dark green
+        else if (progress >= 50) progressColor = '#7cfc00'; // Green
+
+        // Create the card HTML
+        const cardHTML = `
+          <div class="card ${isComplete ? 'complete' : ''}">
+            <h4>${data.customerName || 'Unknown Customer'}</h4>
+            <p>${data.location || 'Unknown Location'}</p>
+            <div class="progress-bar" style="width: ${progress}%; background-color: ${progressColor};"></div>
+            <p>${progress}%</p>
+            ${isComplete ? '<p class="complete-text">Delivery is complete</p>' : ''}
+          </div>
+        `;
+
+        // Append the card to the dashboard
+        dashboard.innerHTML += cardHTML;
+      });
+    });
+  </script>
+ <script>
+  let progressBar = document.querySelector('.progress');
+  let packageIcon = document.querySelector('.package');
+  let topperText = document.querySelector('.topper-text');
+  let percentageDisplay = document.querySelector('.percentage');
+  
+  let packagePosition = 0; // Start position
+  let totalDistance = 100; // Total progress is 100%
+  let speed = 0.05; // Fixed slow speed for the package
+  let isDeliveryComplete = false;
+  let animationFrameId;
+
+  // Function to move the package smoothly
+  function movePackage() {
+      if (packagePosition < totalDistance) {
+          packagePosition += speed; // Move package at a fixed speed
+          let percentage = (packagePosition / totalDistance) * 100;
+          packageIcon.style.left = `calc(${packagePosition}% - 70px)`; // Update package position
+          progressBar.style.width = `${percentage}%`; // Update progress bar width
+          percentageDisplay.textContent = `Delivery in Progress: ${Math.round(percentage)}%`; // Update percentage
+      } else if (packagePosition >= totalDistance && !isDeliveryComplete) {
+          // Once package reaches the end, show delivery complete message and topper text
+          topperText.style.display = "block"; // Show topper text
+          isDeliveryComplete = true;
+
+          // Automatically restart after a short delay
+          setTimeout(resetDelivery, 2000);
+      }
+
+      // Continue the animation at the same speed without speeding up
+      animationFrameId = requestAnimationFrame(movePackage);
+  }
+
+  // Function to reset the delivery
+  function resetDelivery() {
+      packagePosition = 0; // Reset package position
+      isDeliveryComplete = false;
+      topperText.style.display = "none"; // Hide topper text when restarting
+      progressBar.style.width = "0%"; // Reset progress bar
+      percentageDisplay.textContent = "Delivery in Progress: 0%"; // Reset percentage display
+      packageIcon.style.left = "0"; // Reset the package position
+
+      // Restart the animation at the same slow speed
+      movePackage(); // Start the animation again from the beginning
+  }
+
+  // Start the animation
+  movePackage();
+
+</script>
+</body>
+</html>
