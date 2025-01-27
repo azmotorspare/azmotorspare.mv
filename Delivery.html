@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AZ Motor Spare Delivery</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #2C2C2C;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #8B0000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            border-bottom: 4px solid #5c0000;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        .customer-info {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .customer-info input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #888;
+            border-radius: 5px;
+            background-color: #555;
+            color: #fff;
+        }
+        .upload-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .upload-btn:hover {
+            background-color: #5c0000;
+        }
+        .upload-input {
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            height: 30px;
+            margin-top: 20px;
+        }
+        .progress-bar span {
+            display: block;
+            height: 100%;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            border-radius: 8px;
+        }
+        .clear-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .clear-btn:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    AZ Motor Spare Delivery
+</header>
+
+<div class="container">
+    <div class="customer-info">
+        <h3>Customer Info</h3>
+        <input type="text" id="customer-name" placeholder="Enter Customer Name" />
+        <input type="text" id="delivery-location" placeholder="Enter Delivery Location" />
+        <input type="text" id="contact-number" placeholder="Enter Contact Number" />
+        <label class="upload-btn">
+            Upload Transfer Slip
+            <input type="file" class="upload-input" id="upload" />
+        </label>
+        <img id="uploaded-image" style="display: none; margin-top: 20px; width: 100%; max-width: 200px;" />
+    </div>
+
+    <div class="progress-container">
+        <h3>Delivery Progress</h3>
+        <div class="progress-bar">
+            <span id="progress" style="width: 0%;">0%</span>
+        </div>
+        <p id="delivery-location-display" style="display: none; font-weight: bold; color: #32CD32; margin-top: 10px;"></p>
+    </div>
+
+    <button class="clear-btn" id="clear-btn">Clear All Data</button>
+</div>
+
+<script>
+    let progress = 0;
+    const progressBar = document.getElementById('progress');
+    const uploadedImage = document.getElementById('uploaded-image');
+    let customerName = '';
+    let deliveryLocation = '';
+    let contactNumber = '';
+    let transferSlipUploaded = false;
+    let progressInterval;
+    const customerId = Date.now();
+
+    function updateProgress() {
+        if (progress < 50) {
+            progress += 1;
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+            progressBar.style.backgroundColor = '#8B0000';
+            localStorage.setItem('progress_' + customerId, progress);
+        } else if (progress >= 50 && progress < 100) {
+            progress += 1;
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+            progressBar.style.backgroundColor = '#8B0000';
+            localStorage.setItem('progress_' + customerId, progress);
+        } else if (progress === 100) {
+            clearInterval(progressInterval);
+            saveData();
+
+            // Display delivery location in green text
+            const locationDisplay = document.getElementById('delivery-location-display');
+            locationDisplay.textContent = `Delivery Location: ${deliveryLocation}`;
+            locationDisplay.style.display = 'block';
+        }
+    }
+
+    function checkInputs() {
+        if (customerName && deliveryLocation && contactNumber && transferSlipUploaded) {
+            startDeliveryProgress();
+        }
+    }
+
+    function startDeliveryProgress() {
+        progressInterval = setInterval(updateProgress, 600);
+    }
+
+    document.getElementById('customer-name').addEventListener('input', function() {
+        customerName = this.value;
+        checkInputs();
+    });
+
+    document.getElementById('delivery-location').addEventListener('input', function() {
+        deliveryLocation = this.value;
+        checkInputs();
+    });
+
+    document.getElementById('contact-number').addEventListener('input', function() {
+        contactNumber = this.value;
+        checkInputs();
+    });
+
+    const uploadInput = document.getElementById('upload');
+    uploadInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            transferSlipUploaded = true;
+            const file = this.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                uploadedImage.style.display = 'block';
+                uploadedImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            alert("Transfer Slip Uploaded. Starting Delivery Progress...");
+            checkInputs();
+        }
+    });
+
+    function saveData() {
+        if (customerName && deliveryLocation && contactNumber && transferSlipUploaded) {
+            localStorage.setItem('customerName_' + customerId, customerName);
+            localStorage.setItem('deliveryLocation_' + customerId, deliveryLocation);
+            localStorage.setItem('contactNumber_' + customerId, contactNumber);
+            localStorage.setItem('transferSlipUploaded_' + customerId, uploadedImage.src);
+            localStorage.setItem('progress_' + customerId, progress);
+            localStorage.setItem('customerId_' + customerId, customerId);
+        }
+    }
+
+    document.getElementById('clear-btn').addEventListener('click', function() {
+        document.getElementById('customer-name').value = '';
+        document.getElementById('delivery-location').value = '';
+        document.getElementById('contact-number').value = '';
+        document.getElementById('upload').value = '';
+        uploadedImage.style.display = 'none';
+        progress = 0;
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        localStorage.clear();
+
+        const locationDisplay = document.getElementById('delivery-location-display');
+        locationDisplay.style.display = 'none';
+    });
+</script>
+
+</body>
+</html>
