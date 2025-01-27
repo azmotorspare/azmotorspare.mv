@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Summary</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #2C2C2C;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #8B0000;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            border-bottom: 4px solid #5c0000;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        .customer-info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .customer-info-table th, .customer-info-table td {
+            padding: 12px;
+            border: 1px solid #555;
+            text-align: left;
+        }
+        .customer-info-table th {
+            background-color: #444;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            height: 30px;
+            margin-top: 20px;
+        }
+        .progress-bar span {
+            display: block;
+            height: 100%;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            border-radius: 8px;
+        }
+        .complete-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .complete-btn:hover {
+            background-color: #218838;
+        }
+        .delete-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .bold-green {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Delivery Summary
+</header>
+
+<div class="container">
+    <h3>Customer Delivery Summary</h3>
+    <table class="customer-info-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Contact</th>
+                <th>Transfer Slip</th>
+                <th>Progress</th>
+                <th>Action</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody id="customer-table-body">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Load customer data from localStorage
+    function loadCustomerData() {
+        const customerData = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('customerName_')) {
+                const customerId = key.split('_')[1];
+                const name = localStorage.getItem('customerName_' + customerId);
+                const location = localStorage.getItem('deliveryLocation_' + customerId);
+                const contact = localStorage.getItem('contactNumber_' + customerId);
+                const transferSlip = localStorage.getItem('transferSlipUploaded_' + customerId);
+                const progress = localStorage.getItem('progress_' + customerId);
+                customerData.push({ customerId, name, location, contact, transferSlip, progress });
+            }
+        }
+
+        const customerTableBody = document.getElementById('customer-table-body');
+        customerTableBody.innerHTML = ''; // Clear existing rows
+        customerData.forEach((customer) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${customer.name}</td>
+                <td id="location-${customer.customerId}" class="${customer.progress == 100 ? 'bold-green' : ''}">${customer.location}</td>
+                <td>${customer.contact}</td>
+                <td><img src="${customer.transferSlip}" width="100" height="100" /></td>
+                <td>
+                    <div class="progress-bar">
+                        <span style="width: ${customer.progress}%; background-color: ${customer.progress == 100 ? '#28a745' : '#8B0000'}">${customer.progress}%</span>
+                    </div>
+                </td>
+                <td>
+                    <button class="complete-btn" data-id="${customer.customerId}">Complete Delivery</button>
+                </td>
+                <td>
+                    <button class="delete-btn" data-id="${customer.customerId}">Delete</button>
+                </td>
+            `;
+            customerTableBody.appendChild(row);
+        });
+
+        // Add event listeners for buttons
+        document.querySelectorAll('.complete-btn').forEach((btn) => {
+            btn.addEventListener('click', function() {
+                const customerId = this.dataset.id;
+                localStorage.setItem('progress_' + customerId, 100); // Set progress to 100%
+                localStorage.setItem('customerId_' + customerId, customerId);
+                const locationCell = document.getElementById(`location-${customerId}`);
+                locationCell.classList.add('bold-green'); // Make location text bold and green
+                loadCustomerData(); // Refresh customer data after completion
+            });
+        });
+
+        // Add event listeners for delete buttons
+        document.querySelectorAll('.delete-btn').forEach((btn) => {
+            btn.addEventListener('click', function() {
+                const customerId = this.dataset.id;
+                localStorage.removeItem('customerName_' + customerId);
+                localStorage.removeItem('deliveryLocation_' + customerId);
+                localStorage.removeItem('contactNumber_' + customerId);
+                localStorage.removeItem('transferSlipUploaded_' + customerId);
+                localStorage.removeItem('progress_' + customerId);
+                loadCustomerData(); // Refresh customer data after deletion
+            });
+        });
+    }
+
+    // Load the customer data initially
+    loadCustomerData();
+
+    // Set an interval to check for updates every 3 seconds
+    setInterval(loadCustomerData, 3000);
+</script>
+
+</body>
+</html>
