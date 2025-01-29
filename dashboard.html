@@ -159,41 +159,57 @@
       measurementId: "G-V7TC88WW4L"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    /// Initialize Firebase
+// Initialize Firebase
+// Initialize Firebase
+// Initialize Firebase
+// Initialize Firebase
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
-    const dashboard = document.getElementById('dashboard');
+const dashboard = document.getElementById('dashboard');
 
-    // Listen to Firebase database updates
-    firebase.database().ref('deliveries').on('value', (snapshot) => {
-      dashboard.innerHTML = ''; // Clear the dashboard before appending cards
+// Listen to Firebase database updates
+firebase.database().ref('deliveries').on('value', (snapshot) => {
+  dashboard.innerHTML = ''; // Clear the dashboard before appending cards
 
-      snapshot.forEach((childSnapshot) => {
-        const data = childSnapshot.val(); // Get data for each delivery
-        const progress = data.progress || 0; // Ensure progress is a valid number
-        const isComplete = progress === 100;
+  snapshot.forEach((childSnapshot) => {
+    const data = childSnapshot.val(); // Get data for each delivery
+    const progress = data.progress || 0; // Ensure progress is a valid number
+    const startTime = data.startTime || Date.now(); // Start time of delivery
+    const currentTime = Date.now();
+    const elapsedTime = Math.round((currentTime - startTime) / 60000); // Elapsed time in minutes
+    const isComplete = progress === 100;
 
-        // Determine progress bar color
-        let progressColor = '#b30000'; // Default red
-        if (progress === 100) progressColor = '#00ff00'; // Light green
-        else if (progress >= 75) progressColor = '#006400'; // Dark green
-        else if (progress >= 50) progressColor = '#7cfc00'; // Green
+    // Calculate speed-based remaining time
+    const timePerPercentage = progress > 0 ? elapsedTime / progress : 0;
+    const remainingTime = isComplete ? 0 : Math.round((100 - progress) * timePerPercentage);
 
-        // Create the card HTML
-        const cardHTML = `
-          <div class="card ${isComplete ? 'complete' : ''}">
-            <h4>${data.customerName || 'Unknown Customer'}</h4>
-            <p>${data.location || 'Unknown Location'}</p>
-            <div class="progress-bar" style="width: ${progress}%; background-color: ${progressColor};"></div>
-            <p>${progress}%</p>
-            ${isComplete ? '<p class="complete-text">Delivery is complete</p>' : ''}
-          </div>
-        `;
+    // Determine progress bar color
+    let progressColor = '#b30000'; // Default red
+    if (progress === 100) progressColor = '#00ff00'; // Light green
+    else if (progress >= 75) progressColor = '#006400'; // Dark green
+    else if (progress >= 50) progressColor = '#7cfc00'; // Green
 
-        // Append the card to the dashboard
-        dashboard.innerHTML += cardHTML;
-      });
-    });
+    // Create the card HTML
+    const cardHTML = `
+      <div class="card ${isComplete ? 'complete' : ''}">
+        <h4>${data.customerName || 'Unknown Customer'}</h4>
+        <p>${data.location || 'Unknown Location'}</p>
+        <div class="progress-bar" style="width: ${progress}%; background-color: ${progressColor};"></div>
+        <p>${progress}%</p>
+        ${isComplete ? 
+          '<p class="complete-text">Delivery is complete</p>' : 
+          `<p>Estimated Time Remaining: <b>${remainingTime} minutes</b></p>`}
+      </div>
+    `;
+
+    // Append the card to the dashboard
+    dashboard.innerHTML += cardHTML;
+  });
+});
+
+
   </script>
  <script>
   let progressBar = document.querySelector('.progress');
