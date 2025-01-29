@@ -128,17 +128,20 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    const database = firebase.database();
+const database = firebase.database();
 const tableBody = document.querySelector('#dataTable tbody');
+let activeIntervals = {};  // Store active intervals for progress updates
 
+// Listen for changes to the 'deliveries' data in Firebase and update the table
 database.ref('deliveries').on('value', (snapshot) => {
   tableBody.innerHTML = '';
   snapshot.forEach((childSnapshot) => {
     const data = childSnapshot.val();
     const progressBarClass = data.progress === 100 ? 'green' : '';
 
+    // Create the table row with delivery information
     const row = `
-      <tr>
+      <tr data-id="${childSnapshot.key}">
         <td>${data.date}</td>
         <td>${data.customerName}</td>
         <td>${data.contact}</td>
@@ -159,10 +162,63 @@ database.ref('deliveries').on('value', (snapshot) => {
       </tr>
     `;
     tableBody.innerHTML += row;
+
+    // Resume progress if the start time exists
+    const id = childSnapshot.key;
+    if (data.startTime) {
+      let progress = data.progress;
+      let timeInSeconds = data.timeInSeconds;
+      let startTime = data.startTime;
+
+      let elapsedTime = (Date.now() - startTime) / 1000; // elapsed time in seconds
+      if (elapsedTime < timeInSeconds) {
+        progress = (elapsedTime / timeInSeconds) * 100;
+      } else {
+        progress = 100;
+      }
+
+      // Update progress bar UI
+      const row = document.querySelector(`tr[data-id='${id}']`);
+      const progressBar = row.querySelector('.progress-bar div');
+      const progressPercent = row.querySelector('.progress-percent');
+      const rangeInput = row.querySelector('.progress-slider');
+
+      progressBar.style.width = `${progress}%`;
+      progressPercent.textContent = `${Math.round(progress)}%`;
+      rangeInput.value = Math.round(progress);
+
+      // Start the interval for real-time updates if progress is not 100%
+      if (progress < 100 && !activeIntervals[id]) {
+        activeIntervals[id] = setInterval(() => {
+          let currentTime = Date.now();
+          let elapsedTime = (currentTime - startTime) / 1000; // elapsed time in seconds
+          progress = (elapsedTime / timeInSeconds) * 100;
+
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(activeIntervals[id]); // Stop once it reaches 100%
+            delete activeIntervals[id]; // Remove from active intervals
+          }
+
+          // Update UI
+          const progressBar = row.querySelector('.progress-bar div');
+          const progressPercent = row.querySelector('.progress-percent');
+          const rangeInput = row.querySelector('.progress-slider');
+
+          progressBar.style.width = `${progress}%`;
+          progressPercent.textContent = `${Math.round(progress)}%`;
+          rangeInput.value = Math.round(progress);
+
+          // Update Firebase with the current progress
+          database.ref(`deliveries/${id}`).update({ progress: Math.round(progress) });
+
+        }, 1000); // Update every second
+      }
+    }
   });
 });
 
-// Function to auto-complete progress based on entered minutes
+// Handle time input changes to start or update progress
 document.addEventListener('change', (e) => {
   if (e.target.classList.contains('time-input')) {
     const id = e.target.dataset.id;
@@ -180,6 +236,14 @@ document.addEventListener('change', (e) => {
 
     let row = e.target.closest('tr');
 
+    // Store start time and initial progress in Firebase
+    database.ref(`deliveries/${id}`).update({
+      startTime: startTime,
+      progress: progress,
+      timeInSeconds: timeInSeconds
+    });
+
+    // Start updating progress
     let interval = setInterval(() => {
       let currentTime = Date.now();
       let elapsedTime = (currentTime - startTime) / 1000; // elapsed time in seconds
@@ -199,21 +263,29 @@ document.addEventListener('change', (e) => {
       progressPercent.textContent = `${Math.round(progress)}%`;
       rangeInput.value = Math.round(progress);
 
-      // Update Firebase
+      // Update Firebase with the current progress
       database.ref(`deliveries/${id}`).update({ progress: Math.round(progress) });
 
     }, 1000); // Update every second
   }
 });
 
-// Delete functionality
+// Handle delete button click to remove delivery data
 document.addEventListener('click', (e) => {
   if (e.target.classList.contains('delete-btn')) {
     const id = e.target.dataset.id;
+    clearInterval(activeIntervals[id]); // Clear the active interval before deletion
+    delete activeIntervals[id];
     database.ref(`deliveries/${id}`).remove();
   }
 });
 
+// Clear any active intervals on page unload to avoid memory leaks
+window.addEventListener('beforeunload', () => {
+  for (const id in activeIntervals) {
+    clearInterval(activeIntervals[id]);
+  }
+});
 
   </script>
 </body>
