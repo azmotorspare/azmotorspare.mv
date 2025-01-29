@@ -174,17 +174,21 @@ document.addEventListener('change', (e) => {
     }
 
     let timeInSeconds = timeInMinutes * 60;
-    let row = e.target.closest('tr');
     let progress = 0;
-    let step = 100 / timeInSeconds;
+    let startTime = Date.now();
+    let endTime = startTime + timeInSeconds * 1000;
+
+    let row = e.target.closest('tr');
 
     let interval = setInterval(() => {
+      let currentTime = Date.now();
+      let elapsedTime = (currentTime - startTime) / 1000; // elapsed time in seconds
+      progress = (elapsedTime / timeInSeconds) * 100;
+
       if (progress >= 100) {
-        clearInterval(interval);
-        return;
+        progress = 100;
+        clearInterval(interval); // Stop once it reaches 100%
       }
-      progress += step;
-      if (progress > 100) progress = 100;
 
       // Update UI
       const progressBar = row.querySelector('.progress-bar div');
@@ -198,7 +202,6 @@ document.addEventListener('change', (e) => {
       // Update Firebase
       database.ref(`deliveries/${id}`).update({ progress: Math.round(progress) });
 
-      if (progress >= 100) clearInterval(interval);
     }, 1000); // Update every second
   }
 });
