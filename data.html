@@ -28,20 +28,73 @@
     .progress-container {
       display: flex;
       align-items: center;
+      gap: 10px;
     }
+
     .progress-bar {
+      position: relative;
       height: 10px;
-      background-color: #b30000;
-      flex-grow: 1;
+      width: 120px;
+      background: #ddd;
       border-radius: 5px;
-      margin-right: 10px;
+      overflow: hidden;
     }
-    .progress-bar.green {
-      background-color: #00b300;
+
+    .progress-bar div {
+      height: 100%;
+      background: #007bff;
+      transition: width 0.3s ease-in-out;
     }
+
+    .progress-bar.green div {
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+    }
+
     .progress-percent {
-      color: #fff;
+      font-size: 0.9rem;
       font-weight: bold;
+      min-width: 35px;
+      text-align: center;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 150px;
+      height: 8px;
+      background: #ddd;
+      border-radius: 5px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #007bff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: #007bff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .delete-btn {
+      background-color: #ff4d4d;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background-color: #e63939;
     }
   </style>
 </head>
@@ -76,50 +129,74 @@
     firebase.initializeApp(firebaseConfig);
 
     const database = firebase.database();
-    const tableBody = document.querySelector('#dataTable tbody');
+const tableBody = document.querySelector('#dataTable tbody');
 
-    database.ref('deliveries').on('value', (snapshot) => {
-      tableBody.innerHTML = '';
-      snapshot.forEach((childSnapshot) => {
-        const data = childSnapshot.val();
-        const progressBarClass = data.progress === 100 ? 'green' : '';
+database.ref('deliveries').on('value', (snapshot) => {
+  tableBody.innerHTML = '';
+  snapshot.forEach((childSnapshot) => {
+    const data = childSnapshot.val();
+    const progressBarClass = data.progress === 100 ? 'green' : '';
 
-        const row = `
-          <tr>
-            <td>${data.date}</td>
-            <td>${data.customerName}</td>
-            <td>${data.contact}</td>
-            <td>${data.location}</td>
-            <td>
-              <div class="progress-container">
-                <div class="progress-bar ${progressBarClass}" style="width: ${data.progress}%;"></div>
-                <span class="progress-percent">${data.progress}%</span>
-              </div>
-              <input type="range" min="0" max="100" value="${data.progress}" data-id="${childSnapshot.key}">
-            </td>
-            <td>
-              <button class="delete-btn" data-id="${childSnapshot.key}">Delete</button>
-            </td>
-          </tr>
-        `;
-        tableBody.innerHTML += row;
-      });
-    });
+    const row = `
+      <tr>
+        <td>${data.date}</td>
+        <td>${data.customerName}</td>
+        <td>${data.contact}</td>
+        <td>${data.location}</td>
+        <td>
+          <div class="progress-container">
+            <div class="progress-bar ${progressBarClass}">
+              <div style="width: ${data.progress}%"></div>
+            </div>
+            <span class="progress-percent">${data.progress}%</span>
+            <input type="range" min="0" max="100" value="${data.progress}" data-id="${childSnapshot.key}">
+            <input type="number" min="0" max="100" value="${data.progress}" data-id="${childSnapshot.key}" class="progress-input">
+          </div>
+        </td>
+        <td>
+          <button class="delete-btn" data-id="${childSnapshot.key}">Delete</button>
+        </td>
+      </tr>
+    `;
+    tableBody.innerHTML += row;
+  });
+});
 
-    document.addEventListener('input', (e) => {
-      if (e.target.type === 'range') {
-        const progress = e.target.value;
-        const id = e.target.dataset.id;
-        database.ref(`deliveries/${id}`).update({ progress });
-      }
-    });
+// Function to update progress
+function updateProgress(target) {
+  const progress = target.value;
+  const id = target.dataset.id;
+  const row = target.closest('tr');
+  const progressBar = row.querySelector('.progress-bar div');
+  const progressPercent = row.querySelector('.progress-percent');
+  const rangeInput = row.querySelector('input[type="range"]');
+  const numberInput = row.querySelector('.progress-input');
 
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('delete-btn')) {
-        const id = e.target.dataset.id;
-        database.ref(`deliveries/${id}`).remove();
-      }
-    });
+  // Update UI in real-time
+  progressBar.style.width = `${progress}%`;
+  progressPercent.textContent = `${progress}%`;
+  rangeInput.value = progress;
+  numberInput.value = progress;
+
+  // Update Firebase
+  database.ref(`deliveries/${id}`).update({ progress });
+}
+
+// Listen for range and number input changes
+document.addEventListener('input', (e) => {
+  if (e.target.type === 'range' || e.target.type === 'number') {
+    updateProgress(e.target);
+  }
+});
+
+// Delete functionality
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('delete-btn')) {
+    const id = e.target.dataset.id;
+    database.ref(`deliveries/${id}`).remove();
+  }
+});
+
   </script>
 </body>
 </html>
