@@ -149,8 +149,8 @@ database.ref('deliveries').on('value', (snapshot) => {
               <div style="width: ${data.progress}%"></div>
             </div>
             <span class="progress-percent">${data.progress}%</span>
-            <input type="range" min="0" max="100" value="${data.progress}" data-id="${childSnapshot.key}">
-            <input type="number" min="0" max="100" value="${data.progress}" data-id="${childSnapshot.key}" class="progress-input">
+            <input type="range" min="0" max="100" value="${data.progress}" data-id="${childSnapshot.key}" class="progress-slider">
+            <input type="number" min="1" placeholder="Enter minutes" class="time-input" data-id="${childSnapshot.key}">
           </div>
         </td>
         <td>
@@ -162,30 +162,44 @@ database.ref('deliveries').on('value', (snapshot) => {
   });
 });
 
-// Function to update progress
-function updateProgress(target) {
-  const progress = target.value;
-  const id = target.dataset.id;
-  const row = target.closest('tr');
-  const progressBar = row.querySelector('.progress-bar div');
-  const progressPercent = row.querySelector('.progress-percent');
-  const rangeInput = row.querySelector('input[type="range"]');
-  const numberInput = row.querySelector('.progress-input');
+// Function to auto-complete progress based on entered minutes
+document.addEventListener('change', (e) => {
+  if (e.target.classList.contains('time-input')) {
+    const id = e.target.dataset.id;
+    let timeInMinutes = parseFloat(e.target.value);
 
-  // Update UI in real-time
-  progressBar.style.width = `${progress}%`;
-  progressPercent.textContent = `${progress}%`;
-  rangeInput.value = progress;
-  numberInput.value = progress;
+    if (isNaN(timeInMinutes) || timeInMinutes < 1) {
+      alert("Please enter a valid number of minutes.");
+      return;
+    }
 
-  // Update Firebase
-  database.ref(`deliveries/${id}`).update({ progress });
-}
+    let timeInSeconds = timeInMinutes * 60;
+    let row = e.target.closest('tr');
+    let progress = 0;
+    let step = 100 / timeInSeconds;
 
-// Listen for range and number input changes
-document.addEventListener('input', (e) => {
-  if (e.target.type === 'range' || e.target.type === 'number') {
-    updateProgress(e.target);
+    let interval = setInterval(() => {
+      if (progress >= 100) {
+        clearInterval(interval);
+        return;
+      }
+      progress += step;
+      if (progress > 100) progress = 100;
+
+      // Update UI
+      const progressBar = row.querySelector('.progress-bar div');
+      const progressPercent = row.querySelector('.progress-percent');
+      const rangeInput = row.querySelector('.progress-slider');
+
+      progressBar.style.width = `${progress}%`;
+      progressPercent.textContent = `${Math.round(progress)}%`;
+      rangeInput.value = Math.round(progress);
+
+      // Update Firebase
+      database.ref(`deliveries/${id}`).update({ progress: Math.round(progress) });
+
+      if (progress >= 100) clearInterval(interval);
+    }, 1000); // Update every second
   }
 });
 
@@ -196,6 +210,7 @@ document.addEventListener('click', (e) => {
     database.ref(`deliveries/${id}`).remove();
   }
 });
+
 
   </script>
 </body>
