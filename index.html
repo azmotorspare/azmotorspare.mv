@@ -518,22 +518,18 @@ button:hover {
   transition: opacity 1s ease-in-out;
 }
 .animated-button {
-    display: inline-block;
     padding: 10px 20px;
-    font-size: 18px;
+    font-size: 16px;
     color: white;
-    background-color: #3498db; /* Initial background color */
     border: none;
     border-radius: 5px;
     text-decoration: none;
     cursor: pointer;
     transition: transform 0.3s ease;
-    animation: backgroundColorChange 5s infinite; /* Background color animation */
-    position: fixed; /* Pin the button to the screen */
-    right: 20px; /* 20px from the right edge of the screen */
-    /* 20px from the bottom edge of the screen */
+    animation: backgroundColorChange 5s infinite;
+    position: absolute;
+    right: 20px; /* Positions the button on the right side */
 }
-
 .animated-button:hover {
     transform: scale(1.1); /* Hover effect */
 }
@@ -601,6 +597,7 @@ button:hover {
     <a href="review.html">
         <button class="animated-button">Reviews</button>
       </a>
+      
     <select id="filterDropdown" onchange="filterProducts()">
         <option value="all">All Products</option>
         <option value="Hot Sale">Hot Sale</option>
