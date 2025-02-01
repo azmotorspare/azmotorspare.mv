@@ -22,13 +22,11 @@
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      transition: border 1s ease;
     }
-    .progress-bar {
-      height: 10px;
-      background-color: #b30000;
-      border-radius: 5px;
-      margin-top: 10px;
-      transition: background-color 0.3s ease, width 0.3s ease;
+    .card.new-progress {
+      border: 5px solid #e74c3c; /* Animated border for new progress */
     }
     .card.complete .progress-bar {
       background-color: #00ff00;
@@ -40,100 +38,109 @@
       margin-top: 10px;
     }
     .container {
-            position: relative;
-            width: 100%;
-            height: 140px;
-            margin-top: 05px;
-            background-color: #444; /* Dark grey track */
-            border-radius: 10px;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .track {
-            position: absolute;
-            width: 100%;
-            height: 50px;
-            background-color: #333; /* Darker grey for track */
-            border-radius: 25px;
-            margin-top: 50px;
-        }
-
-        .package {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(145deg, #e74c3c, #c0392b); /* Dark red package */
-            border-radius: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 0;
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .person-icon {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 50px;
-            color: #16a085; /* Greenish color for the person */
-        }
-
-        .progress-bar {
-            width: 100%;
-            background-color: #555; /* Dark grey progress bar */
-            height: 5px;
-            margin-top: 10px;
-            border-radius: 5px;
-            position: relative;
-        }
-
-        .progress {
-            background-color: #e74c3c; /* Dark red progress */
-            height: 100%;
-            width: 0%;
-            border-radius: 5px;
-        }
-
-        .delivery-complete {
-            display: none;
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #2ecc71; /* Green for completion */
-        }
-
-        .percentage {
-            margin-top: 10px;
-            font-size: 18px;
-            color: #e74c3c; /* Dark red percentage text */
-        }
-        .topper-text {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2ecc71; /* Greenish color for completion text */
-            margin-top: 20px;
-            display: none; /* Hidden initially */
-        }
-        
-
-
+      position: relative;
+      width: 100%;
+      height: 140px;
+      margin-top: 05px;
+      background-color: #444;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .track {
+      position: absolute;
+      width: 100%;
+      height: 50px;
+      background-color: #333;
+      border-radius: 25px;
+      margin-top: 50px;
+    }
+    .package {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(145deg, #e74c3c, #c0392b);
+      border-radius: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0;
+      box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      color: white;
+      font-weight: bold;
+    }
+    .person-icon {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 50px;
+      color: #16a085;
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #555;
+      height: 5px;
+      margin-top: 10px;
+      border-radius: 5px;
+      position: relative;
+    }
+    .progress {
+      background-color: #e74c3c;
+      height: 100%;
+      width: 0%;
+      border-radius: 5px;
+    }
+    .delivery-complete {
+      display: none;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #2ecc71;
+    }
+    .percentage {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #e74c3c;
+    }
+    .topper-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2ecc71;
+      margin-top: 20px;
+      display: none;
+    }
+    /* Style for dropdown */
+    .filter {
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    
   </style>
 </head>
 <body>
-  
+
   <h2>AZ Motor Spare Delivery - Dashboard</h2>
 
+  <!-- Filter Dropdown -->
+  <select class="filter" id="progressFilter">
+    <option value="all">All Deliveries</option>
+    <option value="in-progress">In Progress</option>
+    <option value="completed">Completed</option>
+  </select>
+
   <div class="dashboard" id="dashboard"></div>
+
   <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
   <script>
@@ -149,86 +156,89 @@
       measurementId: "G-V7TC88WW4L"
     };
 
-    /// Initialize Firebase
-// Initialize Firebase
-// Initialize Firebase
-// Initialize Firebase
-// Initialize Firebase
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);
 
-const dashboard = document.getElementById('dashboard');
+    const dashboard = document.getElementById('dashboard');
+    const progressFilter = document.getElementById('progressFilter');
 
-// Listen to Firebase database updates
-firebase.database().ref('deliveries').on('value', (snapshot) => {
-  dashboard.innerHTML = ''; // Clear the dashboard before appending cards
+    let deliveries = [];
 
-  const deliveries = []; // Store deliveries to sort later
+    // Listen to Firebase database updates
+    firebase.database().ref('deliveries').on('value', (snapshot) => {
+      deliveries = []; // Clear previous data
+      dashboard.innerHTML = ''; // Clear the dashboard before appending cards
 
-  snapshot.forEach((childSnapshot) => {
-    const data = childSnapshot.val(); // Get data for each delivery
-    const progress = data.progress || 0; // Ensure progress is a valid number
-    const startTime = data.startTime || Date.now(); // Start time of delivery
-    const currentTime = Date.now();
-    const elapsedTime = Math.round((currentTime - startTime) / 60000); // Elapsed time in minutes
-    const isComplete = progress === 100;
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        const progress = data.progress || 0;
+        const startTime = data.startTime || Date.now();
+        const currentTime = Date.now();
+        const elapsedTime = Math.round((currentTime - startTime) / 60000); // Elapsed time in minutes
+        const isComplete = progress === 100;
+        const timePerPercentage = progress > 0 ? elapsedTime / progress : 0;
+        const remainingTime = isComplete ? 0 : Math.round((100 - progress) * timePerPercentage);
 
-    // Calculate speed-based remaining time
-    const timePerPercentage = progress > 0 ? elapsedTime / progress : 0;
-    const remainingTime = isComplete ? 0 : Math.round((100 - progress) * timePerPercentage);
+        let progressColor = '#b30000';
+        if (progress === 100) progressColor = '#00ff00';
+        else if (progress >= 75) progressColor = '#006400';
+        else if (progress >= 50) progressColor = '#7cfc00';
 
-    // Determine progress bar color
-    let progressColor = '#b30000'; // Default red
-    if (progress === 100) progressColor = '#00ff00'; // Light green
-    else if (progress >= 75) progressColor = '#006400'; // Dark green
-    else if (progress >= 50) progressColor = '#7cfc00'; // Green
+        const cardData = {
+          customerName: data.customerName || 'Unknown Customer',
+          location: data.location || 'Unknown Location',
+          progress,
+          isComplete,
+          remainingTime,
+          progressColor,
+          isNewProgress: data.isNewProgress || false, // For live animation
+        };
 
-    // Create card data
-    const cardData = {
-      customerName: data.customerName || 'Unknown Customer',
-      location: data.location || 'Unknown Location',
-      progress,
-      isComplete,
-      remainingTime,
-      progressColor,
-    };
+        deliveries.push(cardData);
+      });
 
-    // Push to deliveries array for sorting later
-    deliveries.push(cardData);
-  });
+      // Filter based on the selected filter option
+      const filterValue = progressFilter.value;
+      const filteredDeliveries = deliveries.filter((data) => {
+        if (filterValue === 'in-progress') return !data.isComplete;
+        if (filterValue === 'completed') return data.isComplete;
+        return true; // Show all deliveries for "All Deliveries"
+      });
 
-  // Sort deliveries based on the new conditions
-  deliveries.sort((a, b) => {
-    // Sort deliveries with progress below 5% to the top
-    if (a.progress < 5 && b.progress >= 5) return -1;
-    if (b.progress < 5 && a.progress >= 5) return 1;
-    // Sort by progress from highest to lowest
-    return b.progress - a.progress;
-  });
+      // Sort deliveries based on progress
+      filteredDeliveries.sort((a, b) => {
+        if (a.progress < 5 && b.progress >= 5) return -1;
+        if (b.progress < 5 && a.progress >= 5) return 1;
+        return b.progress - a.progress;
+      });
 
-  // Reverse the array to ensure new data appears first
-  deliveries.reverse();
+      filteredDeliveries.reverse(); // Show new data first
 
-  // Append sorted cards to the dashboard
-  deliveries.forEach((data) => {
-    const cardHTML = `
-      <div class="card ${data.isComplete ? 'complete' : ''}">
-        <h4>${data.customerName}</h4>
-        <p>${data.location}</p>
-        <div class="progress-bar" style="width: ${data.progress}%; background-color: ${data.progressColor};"></div>
-        <p>${data.progress}%</p>
-        ${data.isComplete ? 
-          '<p class="complete-text">Delivery is complete</p>' : 
-          `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
-      </div>
-    `;
+      filteredDeliveries.forEach((data) => {
+        const cardHTML = `
+          <div class="card ${data.isComplete ? 'complete' : ''} ${data.isNewProgress ? 'new-progress' : ''}">
+            <h4>${data.customerName}</h4>
+            <p>${data.location}</p>
+            <div class="progress-bar" style="width: ${data.progress}%; background-color: ${data.progressColor};"></div>
+            <p>${data.progress}%</p>
+            ${data.isComplete ? 
+              '<p class="complete-text">Delivery is complete</p>' : 
+              `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
+          </div>
+        `;
+        dashboard.innerHTML += cardHTML;
+      });
 
-    // Append the card to the dashboard
-    dashboard.innerHTML += cardHTML;
-  });
-});
+      // Reset the "new progress" flag for live animation
+      deliveries.forEach((data) => {
+        if (data.isNewProgress) data.isNewProgress = false; // Reset for the next update
+      });
+    });
 
+    // Optionally, set the progress filter to reflect the current state
+    progressFilter.addEventListener('change', () => {
+      firebase.database().ref('deliveries').once('value'); // Trigger update with new filter
+    });
   </script>
- 
+
 </body>
 </html>
