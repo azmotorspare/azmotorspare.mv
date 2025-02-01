@@ -127,7 +127,7 @@
       measurementId: "G-V7TC88WW4L",
     };
     firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+    const database = firebase.database();
 const tableBody = document.querySelector('#dataTable tbody');
 let activeIntervals = {}; // Store active intervals for progress updates
 
@@ -194,8 +194,8 @@ document.addEventListener('change', (e) => {
     let timeInSeconds = timeInMinutes * 60;
     let startTime = Date.now();
 
+    // Update Firebase with start time, total time, and running state
     database.ref(`deliveries/${id}`).update({ startTime, timeInSeconds, running: true });
-    startProgress(id, startTime, timeInSeconds);
   }
 });
 
