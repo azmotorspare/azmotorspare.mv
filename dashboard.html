@@ -125,7 +125,46 @@
       border: none;
       font-size: 16px;
     }
-    
+    /* Rating and Comment Styles */
+    .rating {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .rating span {
+      font-size: 24px;
+      color: #ccc;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .rating span.active {
+      color: #ffcc00;
+    }
+    .comment-section {
+      margin-top: 10px;
+      display: none;
+    }
+    .comment-section textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #444;
+      color: #fff;
+      resize: none;
+    }
+    .comment-section button {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #16a085;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .comment-section button:hover {
+      background-color: #138a72;
+    }
   </style>
 </head>
 <body>
@@ -184,6 +223,7 @@
         else if (progress >= 50) progressColor = '#7cfc00';
 
         const cardData = {
+          id: childSnapshot.key, // Unique ID for each delivery
           customerName: data.customerName || 'Unknown Customer',
           location: data.location || 'Unknown Location',
           progress,
@@ -191,6 +231,8 @@
           remainingTime,
           progressColor,
           isNewProgress: data.isNewProgress || false, // For live animation
+          rating: data.rating || 0, // Default rating
+          comment: data.comment || '' // Default comment
         };
 
         deliveries.push(cardData);
@@ -221,11 +263,53 @@
             <div class="progress-bar" style="width: ${data.progress}%; background-color: ${data.progressColor};"></div>
             <p>${data.progress}%</p>
             ${data.isComplete ? 
-              '<p class="complete-text">Delivery is complete</p>' : 
+              `<p class="complete-text">Delivery is complete</p>
+               <div class="rating">
+                 ${Array.from({ length: 5 }, (_, i) => `
+                   <span class="${i < data.rating ? 'active' : ''}" data-rating="${i + 1}">★</span>
+                 `).join('')}
+               </div>
+               <div class="comment-section">
+                 <textarea placeholder="Write a comment...">${data.comment || ''}</textarea>
+                 <button>Submit</button>
+               </div>` : 
               `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
           </div>
         `;
         dashboard.innerHTML += cardHTML;
+      });
+
+      // Add event listeners for rating and comment submission
+      document.querySelectorAll('.rating').forEach((ratingElement, index) => {
+        const stars = ratingElement.querySelectorAll('span');
+        const commentSection = ratingElement.nextElementSibling;
+        const textarea = commentSection.querySelector('textarea');
+        const button = commentSection.querySelector('button');
+
+        stars.forEach((star) => {
+          star.addEventListener('click', () => {
+            const rating = parseInt(star.getAttribute('data-rating'));
+            stars.forEach((s, i) => {
+              s.classList.toggle('active', i < rating);
+            });
+            commentSection.style.display = 'block'; // Show comment section
+          });
+        });
+
+        button.addEventListener('click', () => {
+          const comment = textarea.value.trim();
+          const deliveryId = filteredDeliveries[index].id;
+          const rating = Array.from(stars).filter((s) => s.classList.contains('active')).length;
+
+          // Save rating and comment to Firebase
+          firebase.database().ref(`deliveries/${deliveryId}`).update({
+            rating,
+            comment
+          });
+
+          // Hide comment section after submission
+          commentSection.style.display = 'none';
+        });
       });
 
       // Reset the "new progress" flag for live animation
