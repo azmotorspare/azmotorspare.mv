@@ -124,6 +124,7 @@
             margin-top: 20px;
             display: none; /* Hidden initially */
         }
+        
 
 
   </style>
@@ -131,8 +132,7 @@
 <body>
   
   <h2>AZ Motor Spare Delivery - Dashboard</h2>
-  
-  
+
   <div class="dashboard" id="dashboard"></div>
   <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
@@ -163,6 +163,8 @@ const dashboard = document.getElementById('dashboard');
 firebase.database().ref('deliveries').on('value', (snapshot) => {
   dashboard.innerHTML = ''; // Clear the dashboard before appending cards
 
+  const deliveries = []; // Store deliveries to sort later
+
   snapshot.forEach((childSnapshot) => {
     const data = childSnapshot.val(); // Get data for each delivery
     const progress = data.progress || 0; // Ensure progress is a valid number
@@ -181,16 +183,43 @@ firebase.database().ref('deliveries').on('value', (snapshot) => {
     else if (progress >= 75) progressColor = '#006400'; // Dark green
     else if (progress >= 50) progressColor = '#7cfc00'; // Green
 
-    // Create the card HTML
+    // Create card data
+    const cardData = {
+      customerName: data.customerName || 'Unknown Customer',
+      location: data.location || 'Unknown Location',
+      progress,
+      isComplete,
+      remainingTime,
+      progressColor,
+    };
+
+    // Push to deliveries array for sorting later
+    deliveries.push(cardData);
+  });
+
+  // Sort deliveries based on the new conditions
+  deliveries.sort((a, b) => {
+    // Sort deliveries with progress below 5% to the top
+    if (a.progress < 5 && b.progress >= 5) return -1;
+    if (b.progress < 5 && a.progress >= 5) return 1;
+    // Sort by progress from highest to lowest
+    return b.progress - a.progress;
+  });
+
+  // Reverse the array to ensure new data appears first
+  deliveries.reverse();
+
+  // Append sorted cards to the dashboard
+  deliveries.forEach((data) => {
     const cardHTML = `
-      <div class="card ${isComplete ? 'complete' : ''}">
-        <h4>${data.customerName || 'Unknown Customer'}</h4>
-        <p>${data.location || 'Unknown Location'}</p>
-        <div class="progress-bar" style="width: ${progress}%; background-color: ${progressColor};"></div>
-        <p>${progress}%</p>
-        ${isComplete ? 
+      <div class="card ${data.isComplete ? 'complete' : ''}">
+        <h4>${data.customerName}</h4>
+        <p>${data.location}</p>
+        <div class="progress-bar" style="width: ${data.progress}%; background-color: ${data.progressColor};"></div>
+        <p>${data.progress}%</p>
+        ${data.isComplete ? 
           '<p class="complete-text">Delivery is complete</p>' : 
-          `<p>Estimated Time Remaining: <b>${remainingTime} minutes</b></p>`}
+          `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
       </div>
     `;
 
@@ -198,7 +227,6 @@ firebase.database().ref('deliveries').on('value', (snapshot) => {
     dashboard.innerHTML += cardHTML;
   });
 });
-
 
   </script>
  
