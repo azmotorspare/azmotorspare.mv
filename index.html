@@ -505,6 +505,7 @@ button:hover {
         .button:active {
             background-color: #660000; /* Darker red when clicked */
         }
+        
 
 
 
@@ -516,6 +517,38 @@ button:hover {
   opacity: 0;
   transition: opacity 1s ease-in-out;
 }
+.animated-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 18px;
+    color: white;
+    background-color: #3498db; /* Initial background color */
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    animation: backgroundColorChange 5s infinite; /* Background color animation */
+    position: fixed; /* Pin the button to the screen */
+    right: 20px; /* 20px from the right edge of the screen */
+    /* 20px from the bottom edge of the screen */
+}
+
+.animated-button:hover {
+    transform: scale(1.1); /* Hover effect */
+}
+
+@keyframes backgroundColorChange {
+    0% { background-color: #3498db; } /* Blue */
+    25% { background-color: #e74c3c; } /* Red */
+    50% { background-color: #9b59b6; } /* Purple */
+    75% { background-color: #2ecc71; } /* Green */
+    100% { background-color: #3498db; } /* Back to Blue */
+}
+
+
+
+
 
 .product-image.active {
   opacity: 1;
@@ -562,7 +595,12 @@ button:hover {
    
 </div>
 <button class="button" onclick="window.location.href='dashboard.html'">Delivery Live Dashboard</button>
+
+  
 <div class="filter-container">
+    <a href="review.html">
+        <button class="animated-button">Reviews</button>
+      </a>
     <select id="filterDropdown" onchange="filterProducts()">
         <option value="all">All Products</option>
         <option value="Hot Sale">Hot Sale</option>
@@ -571,6 +609,8 @@ button:hover {
     </select>
     <input type="text" id="searchInput" placeholder="Search by name..." onkeyup="searchProducts()">
 </div>
+
+
 
 <div class="product-name-filter-container">
     <select id="nameFilterDropdown" onchange="filterByProductName()">
@@ -1025,6 +1065,6 @@ function nextImage() {
         }
     }
  </script>
-
+ 
 </body>
 </html>
