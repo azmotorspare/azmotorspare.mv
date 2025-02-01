@@ -131,18 +131,8 @@
 <body>
   
   <h2>AZ Motor Spare Delivery - Dashboard</h2>
-  <div class="topper-text">100% - Delivery is Complete</div>
-  <div class="container">
-    <div class="track"></div>
-    <div class="package">📦</div>
-    <div class="person-icon">🚶‍♂️</div>
-</div>
-<div class="progress-bar">
-    <div class="progress"></div>
-</div>
-<div class="percentage">Delivery in Progress: 0%</div>
-<div class="delivery-complete">Delivery Complete</div>
-
+  
+  
   <div class="dashboard" id="dashboard"></div>
   <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-database.js"></script>
@@ -211,55 +201,6 @@ firebase.database().ref('deliveries').on('value', (snapshot) => {
 
 
   </script>
- <script>
-  let progressBar = document.querySelector('.progress');
-  let packageIcon = document.querySelector('.package');
-  let topperText = document.querySelector('.topper-text');
-  let percentageDisplay = document.querySelector('.percentage');
-  
-  let packagePosition = 0; // Start position
-  let totalDistance = 100; // Total progress is 100%
-  let speed = 0.05; // Fixed slow speed for the package
-  let isDeliveryComplete = false;
-  let animationFrameId;
-
-  // Function to move the package smoothly
-  function movePackage() {
-      if (packagePosition < totalDistance) {
-          packagePosition += speed; // Move package at a fixed speed
-          let percentage = (packagePosition / totalDistance) * 100;
-          packageIcon.style.left = `calc(${packagePosition}% - 70px)`; // Update package position
-          progressBar.style.width = `${percentage}%`; // Update progress bar width
-          percentageDisplay.textContent = `Delivery in Progress: ${Math.round(percentage)}%`; // Update percentage
-      } else if (packagePosition >= totalDistance && !isDeliveryComplete) {
-          // Once package reaches the end, show delivery complete message and topper text
-          topperText.style.display = "block"; // Show topper text
-          isDeliveryComplete = true;
-
-          // Automatically restart after a short delay
-          setTimeout(resetDelivery, 2000);
-      }
-
-      // Continue the animation at the same speed without speeding up
-      animationFrameId = requestAnimationFrame(movePackage);
-  }
-
-  // Function to reset the delivery
-  function resetDelivery() {
-      packagePosition = 0; // Reset package position
-      isDeliveryComplete = false;
-      topperText.style.display = "none"; // Hide topper text when restarting
-      progressBar.style.width = "0%"; // Reset progress bar
-      percentageDisplay.textContent = "Delivery in Progress: 0%"; // Reset percentage display
-      packageIcon.style.left = "0"; // Reset the package position
-
-      // Restart the animation at the same slow speed
-      movePackage(); // Start the animation again from the beginning
-  }
-
-  // Start the animation
-  movePackage();
-
-</script>
+ 
 </body>
 </html>
