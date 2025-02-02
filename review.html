@@ -98,7 +98,9 @@
       feedbackContainer.innerHTML = ''; // Clear previous feedback
       let reviewCountValue = 0;
 
-      firebase.database().ref('deliveries').on('value', (snapshot) => {
+      firebase.database().ref('deliveries').once('value').then((snapshot) => {
+        const feedbackCards = [];
+
         snapshot.forEach((childSnapshot) => {
           const data = childSnapshot.val();
           const customerName = data.customerName || 'Unknown Customer';
@@ -116,11 +118,13 @@
                 <div class="comment">${comment}</div>
               </div>
             `;
-            feedbackContainer.innerHTML += feedbackCardHTML;
+            feedbackCards.push(feedbackCardHTML);
             reviewCountValue++;
           }
         });
 
+        // Append all feedback cards at once
+        feedbackContainer.innerHTML = feedbackCards.join('');
         // Update the review count display
         reviewCount.textContent = `Total Reviews: ${reviewCountValue}`;
       });
