@@ -165,6 +165,10 @@
     .comment-section button:hover {
       background-color: #138a72;
     }
+    .submitted {
+      pointer-events: none; /* Disable further interaction */
+      opacity: 0.7; /* Make it look disabled */
+    }
   </style>
 </head>
 <body>
@@ -232,7 +236,8 @@
           progressColor,
           isNewProgress: data.isNewProgress || false, // For live animation
           rating: data.rating || 0, // Default rating
-          comment: data.comment || '' // Default comment
+          comment: data.comment || '', // Default comment
+          isSubmitted: data.isSubmitted || false // Track if rating/comment is submitted
         };
 
         deliveries.push(cardData);
@@ -264,15 +269,17 @@
             <p>${data.progress}%</p>
             ${data.isComplete ? 
               `<p class="complete-text">Delivery is complete</p>
-               <div class="rating">
-                 ${Array.from({ length: 5 }, (_, i) => `
-                   <span class="${i < data.rating ? 'active' : ''}" data-rating="${i + 1}">★</span>
-                 `).join('')}
-               </div>
-               <div class="comment-section">
-                 <textarea placeholder="Write a comment...">${data.comment || ''}</textarea>
-                 <button>Submit</button>
-               </div>` : 
+               ${!data.isSubmitted ? 
+                 `<div class="rating">
+                   ${Array.from({ length: 5 }, (_, i) => `
+                     <span class="${i < data.rating ? 'active' : ''}" data-rating="${i + 1}">★</span>
+                   `).join('')}
+                 </div>
+                 <div class="comment-section">
+                   <textarea placeholder="Write a comment...">${data.comment || ''}</textarea>
+                   <button>Submit</button>
+                 </div>` : 
+                 `<p class="complete-text">Rating and comment submitted.</p>`}` : 
               `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
           </div>
         `;
@@ -301,14 +308,17 @@
           const deliveryId = filteredDeliveries[index].id;
           const rating = Array.from(stars).filter((s) => s.classList.contains('active')).length;
 
-          // Save rating and comment to Firebase
+          // Save rating, comment, and mark as submitted in Firebase
           firebase.database().ref(`deliveries/${deliveryId}`).update({
             rating,
-            comment
+            comment,
+            isSubmitted: true
           });
 
-          // Hide comment section after submission
-          commentSection.style.display = 'none';
+          // Disable further interaction
+          ratingElement.classList.add('submitted');
+          commentSection.classList.add('submitted');
+          button.disabled = true;
         });
       });
 
