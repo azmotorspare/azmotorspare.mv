@@ -371,6 +371,7 @@ button:hover {
             font-size: 0.9em;
             color: #555;
         }
+        
 
         .remove-item {
             font-size: 1em;
@@ -518,8 +519,8 @@ button:hover {
   transition: opacity 1s ease-in-out;
 }
 .animated-button {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 9px 15px;
+    font-size: 15px;
     color: white;
     border: none;
     border-radius: 5px;
@@ -955,6 +956,36 @@ setInterval(showNextImage, 3000);
                 margin: 0 auto;
                 max-width: 75px; /* Adjust size of the logo */
             }
+                .delivery-button {
+            background-color: #4CAF50; /* Initial green background */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+            animation: colorChange 5s infinite; /* Color change animation */
+        }
+        .delivery-button:hover {
+            transform: scale(1.05); /* Slightly enlarge the button on hover */
+        }
+        .delivery-button:active {
+            transform: scale(0.95); /* Slightly shrink the button when clicked */
+        }
+
+        /* Keyframes for color change animation */
+        @keyframes colorChange {
+            0% { background-color: #4CAF50; } /* Green */
+            25% { background-color: #2196F3; } /* Blue */
+            50% { background-color: #FF9800; } /* Orange */
+            75% { background-color: #9C27B0; } /* Purple */
+            100% { background-color: #4CAF50; } /* Back to green */
+        }
 
                     </style>
                 </head>
@@ -965,19 +996,24 @@ setInterval(showNextImage, 3000);
                     ${invoiceTable}
                     
     <strong>Bank Account Details:</strong><br>
-    <span style="font-weight: normal;">Bank Name: XYZ Bank</span><br>
+    <span style="font-weight: normal;">Bank Name: BML</span><br>
     <span style="font-weight: normal;">Account Number: 
-        <span id="accountNumber" style="font-weight: bold; color: blue; cursor: pointer;" onclick="copyAccountNumber()">1234567890</span>
+        <span id="accountNumber" style="font-weight: bold; color: blue; cursor: pointer;" onclick="copyAccountNumber()">7701513295101</span>
     </span><br>
-    <span style="font-weight: normal;">Branch: Male, Maldives</span><br>
-    <span style="font-weight: normal;">SWIFT Code: XYZABC123</span><br>
-    <span style="font-weight: normal;">Account Holder: Ahmed Vaseem</span>
+    <span style="font-weight: normal;">Account Holder: LAST HUNT</span>
 </p>
                 </body>
                 <p style="text-align: center; font-size: 1.1em;">Thank you for shopping with us!</p>
                     <p style="text-align: left; font-size: 1em; margin-top: 30px;">
-                         <!-- Delivery Button -->
-            <button class="delivery-button" onclick="window.location.href='entry.html'">Go to Delivery</button>
+    <!-- Delivery Button -->
+    <button class="delivery-button" onclick="startProgressBar()">Go to Delivery</button>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</p>
+
+            
             </html>
         `);
     }
