@@ -201,137 +201,138 @@
 
     firebase.initializeApp(firebaseConfig);
 
-    const dashboard = document.getElementById('dashboard');
-    const progressFilter = document.getElementById('progressFilter');
+const dashboard = document.getElementById('dashboard');
+const progressFilter = document.getElementById('progressFilter');
 
-    let deliveries = [];
+let deliveries = [];
 
-    // Listen to Firebase database updates
-    firebase.database().ref('deliveries').on('value', (snapshot) => {
-      deliveries = []; // Clear previous data
-      dashboard.innerHTML = ''; // Clear the dashboard before appending cards
+// Listen to Firebase database updates
+firebase.database().ref('deliveries').on('value', (snapshot) => {
+  deliveries = []; // Clear previous data
+  dashboard.innerHTML = ''; // Clear the dashboard before appending cards
 
-      snapshot.forEach((childSnapshot) => {
-        const data = childSnapshot.val();
-        const progress = data.progress || 0;
-        const startTime = data.startTime || Date.now();
-        const currentTime = Date.now();
-        const elapsedTime = Math.round((currentTime - startTime) / 60000); // Elapsed time in minutes
-        const isComplete = progress === 100;
-        const timePerPercentage = progress > 0 ? elapsedTime / progress : 0;
-        const remainingTime = isComplete ? 0 : Math.round((100 - progress) * timePerPercentage);
+  snapshot.forEach((childSnapshot) => {
+    const data = childSnapshot.val();
+    const progress = data.progress || 0;
+    const startTime = data.startTime || Date.now();
+    const currentTime = Date.now();
+    const elapsedTime = Math.round((currentTime - startTime) / 60000); // Elapsed time in minutes
+    const isComplete = progress === 100;
+    const timePerPercentage = progress > 0 ? elapsedTime / progress : 0;
+    const remainingTime = isComplete ? 0 : Math.round((100 - progress) * timePerPercentage);
 
-        let progressColor = '#b30000';
-        if (progress === 100) progressColor = '#00ff00';
-        else if (progress >= 75) progressColor = '#006400';
-        else if (progress >= 50) progressColor = '#7cfc00';
+    let progressColor = '#b30000';
+    if (progress === 100) progressColor = '#00ff00';
+    else if (progress >= 75) progressColor = '#006400';
+    else if (progress >= 50) progressColor = '#7cfc00';
 
-        const cardData = {
-          id: childSnapshot.key, // Unique ID for each delivery
-          customerName: data.customerName || 'Unknown Customer',
-          location: data.location || 'Unknown Location',
-          progress,
-          isComplete,
-          remainingTime,
-          progressColor,
-          isNewProgress: data.isNewProgress || false, // For live animation
-          rating: data.rating || 0, // Default rating
-          comment: data.comment || '', // Default comment
-          isSubmitted: data.isSubmitted || false // Track if rating/comment is submitted
-        };
+    const cardData = {
+      id: childSnapshot.key, // Unique ID for each delivery
+      customerName: data.customerName || 'Unknown Customer',
+      location: data.location || 'Unknown Location',
+      progress,
+      isComplete,
+      remainingTime,
+      progressColor,
+      isNewProgress: data.isNewProgress || false, // For live animation
+      rating: data.rating || 0, // Default rating
+      comment: data.comment || '', // Default comment
+      isSubmitted: data.isSubmitted || false // Track if rating/comment is submitted
+    };
 
-        deliveries.push(cardData);
-      });
+    deliveries.push(cardData);
+  });
 
-      // Filter based on the selected filter option
-      const filterValue = progressFilter.value;
-      const filteredDeliveries = deliveries.filter((data) => {
-        if (filterValue === 'in-progress') return !data.isComplete;
-        if (filterValue === 'completed') return data.isComplete;
-        return true; // Show all deliveries for "All Deliveries"
-      });
+  // Filter based on the selected filter option
+  const filterValue = progressFilter.value;
+  const filteredDeliveries = deliveries.filter((data) => {
+    if (filterValue === 'in-progress') return !data.isComplete;
+    if (filterValue === 'completed') return data.isComplete;
+    return true; // Show all deliveries for "All Deliveries"
+  });
 
-      // Sort deliveries based on progress
-      filteredDeliveries.sort((a, b) => {
-        if (a.progress < 5 && b.progress >= 5) return -1;
-        if (b.progress < 5 && a.progress >= 5) return 1;
-        return b.progress - a.progress;
-      });
+  // Sort deliveries based on progress
+  filteredDeliveries.sort((a, b) => {
+    if (a.progress < 5 && b.progress >= 5) return -1;
+    if (b.progress < 5 && a.progress >= 5) return 1;
+    return b.progress - a.progress;
+  });
 
-      filteredDeliveries.reverse(); // Show new data first
+  filteredDeliveries.reverse(); // Show new data first
 
-      filteredDeliveries.forEach((data) => {
-        const cardHTML = `
-          <div class="card ${data.isComplete ? 'complete' : ''} ${data.isNewProgress ? 'new-progress' : ''}">
-            <h4>${data.customerName}</h4>
-            <p>${data.location}</p>
-            <div class="progress-bar" style="width: ${data.progress}%; background-color: ${data.progressColor};"></div>
-            <p>${data.progress}%</p>
-            ${data.isComplete ? 
-              `<p class="complete-text">Delivery is complete</p>
-               ${!data.isSubmitted ? 
-                 `<div class="rating">
-                   ${Array.from({ length: 5 }, (_, i) => `
-                     <span class="${i < data.rating ? 'active' : ''}" data-rating="${i + 1}">★</span>
-                   `).join('')}
-                 </div>
-                 <div class="comment-section">
-                   <textarea placeholder="Write a comment...">${data.comment || ''}</textarea>
-                   <button>Submit</button>
-                 </div>` : 
-                 `<p class="complete-text">Rating and comment submitted.</p>`}` : 
-              `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
-          </div>
-        `;
-        dashboard.innerHTML += cardHTML;
-      });
+  filteredDeliveries.forEach((data) => {
+    const cardHTML = `
+      <div class="card ${data.isComplete ? 'complete' : ''} ${data.isNewProgress ? 'new-progress' : ''}">
+        <h4>${data.customerName}</h4>
+        <p>${data.location}</p>
+        <div class="progress-bar" style="width: ${data.progress}%; background-color: ${data.progressColor};"></div>
+        <p>${data.progress}%</p>
+        ${data.isComplete ? 
+          `<p class="complete-text">Delivery is complete</p>
+           <div class="rating">
+             ${Array.from({ length: 5 }, (_, i) => `
+               <span class="${i < data.rating ? 'active' : ''}" data-rating="${i + 1}">★</span>
+             `).join('')}
+           </div>
+           ${!data.isSubmitted ? 
+             `<div class="comment-section">
+               <textarea placeholder="Write a comment...">${data.comment || ''}</textarea>
+               <button>Submit</button>
+             </div>` : 
+             `<p class="complete-text">Comment submitted.</p>`}` : 
+          `<p>Estimated Time Remaining: <b>${data.remainingTime} minutes</b></p>`}
+      </div>
+    `;
+    dashboard.innerHTML += cardHTML;
+  });
 
-      // Add event listeners for rating and comment submission
-      document.querySelectorAll('.rating').forEach((ratingElement, index) => {
-        const stars = ratingElement.querySelectorAll('span');
-        const commentSection = ratingElement.nextElementSibling;
-        const textarea = commentSection.querySelector('textarea');
-        const button = commentSection.querySelector('button');
+  // Add event listeners for rating and comment submission
+  document.querySelectorAll('.rating').forEach((ratingElement, index) => {
+    const stars = ratingElement.querySelectorAll('span');
+    const commentSection = ratingElement.nextElementSibling;
+    const textarea = commentSection?.querySelector('textarea');
+    const button = commentSection?.querySelector('button');
 
-        stars.forEach((star) => {
-          star.addEventListener('click', () => {
-            const rating = parseInt(star.getAttribute('data-rating'));
-            stars.forEach((s, i) => {
-              s.classList.toggle('active', i < rating);
-            });
-            commentSection.style.display = 'block'; // Show comment section
+    if (button && textarea) {
+      stars.forEach((star) => {
+        star.addEventListener('click', () => {
+          const rating = parseInt(star.getAttribute('data-rating'));
+          stars.forEach((s, i) => {
+            s.classList.toggle('active', i < rating);
           });
-        });
-
-        button.addEventListener('click', () => {
-          const comment = textarea.value.trim();
-          const deliveryId = filteredDeliveries[index].id;
-          const rating = Array.from(stars).filter((s) => s.classList.contains('active')).length;
-
-          // Save rating, comment, and mark as submitted in Firebase
-          firebase.database().ref(`deliveries/${deliveryId}`).update({
-            rating,
-            comment,
-            isSubmitted: true
-          });
-
-          // Disable further interaction
-          ratingElement.classList.add('submitted');
-          commentSection.classList.add('submitted');
-          button.disabled = true;
+          commentSection.style.display = 'block'; // Show comment section
         });
       });
 
-      // Reset the "new progress" flag for live animation
-      deliveries.forEach((data) => {
-        if (data.isNewProgress) data.isNewProgress = false; // Reset for the next update
-      });
-    });
+      button.addEventListener('click', () => {
+        const comment = textarea.value.trim();
+        const deliveryId = filteredDeliveries[index].id;
+        const rating = Array.from(stars).filter((s) => s.classList.contains('active')).length;
 
-    // Optionally, set the progress filter to reflect the current state
-    progressFilter.addEventListener('change', () => {
-      firebase.database().ref('deliveries').once('value'); // Trigger update with new filter
-    });
+        // Save rating, comment, and mark as submitted in Firebase
+        firebase.database().ref(`deliveries/${deliveryId}`).update({
+          rating,
+          comment,
+          isSubmitted: true
+        });
+
+        // Hide only the comment input box
+        commentSection.style.display = 'none';
+        button.disabled = true;
+      });
+    }
+  });
+
+  // Reset the "new progress" flag for live animation
+  deliveries.forEach((data) => {
+    if (data.isNewProgress) data.isNewProgress = false; // Reset for the next update
+  });
+});
+
+// Optionally, set the progress filter to reflect the current state
+progressFilter.addEventListener('change', () => {
+  firebase.database().ref('deliveries').once('value'); // Trigger update with new filter
+});
   </script>
 
 </body>
