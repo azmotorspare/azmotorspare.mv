@@ -68,6 +68,33 @@ h1 {
     margin: 0;
 }
 
+@keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        ol {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        #warningMessage {
+            display: none;
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+            align-items: center;
+            gap: 5px;
+        }
+        .warning-icon {
+            font-size: 20px;
+            color: red;
+        }
+
         .cart-icon span {
             position: absolute;
             top: -10px;
@@ -578,6 +605,7 @@ button:hover {
   animation: colorChange 2s infinite;
 }
 
+
     </style>
 </head>
 <body>
@@ -617,6 +645,7 @@ button:hover {
 
 
 
+
 <div class="product-name-filter-container">
     <select id="nameFilterDropdown" onchange="filterByProductName()">
         <option value="all">All Products</option>
@@ -647,10 +676,16 @@ button:hover {
 <div class="sidebar" id="sidebar">
     <button class="close-btn" onclick="toggleSidebar()">&times;</button>
     <a href="index.html">Products</a>
-    <a href="Pre.html">Request Any Orders</a>
-    <a href="viewData.html" onclick="checkPassword()">Pre-Orders</a> 
-    <a href="data.html" onclick="checkPassword()">Delivery</a> 
+    <a href="Pre.html">Pre-Orders</a>
     <a href="About.html">About</a>
+    <button onclick="checkPassword()">AZ Motor Spare</button>
+    
+    
+    <ol id="buttonContainer" style="display: none;">
+        <li><button onclick="window.location.href='viewData.html'">Pre-Orders</button></li>
+        <li><button onclick="window.location.href='data.html'">Delivery</button></li>
+    </ol>
+    
     
     <div class="coming-soon">
       <h3>Coming Soon</h3>
@@ -1102,16 +1137,17 @@ function nextImage() {
 
 
  </script>
+ 
  <script>
     function checkPassword() {
-        var password = prompt("Data Page Acess Only AZ MOTOR SPARE:");
-        if (password === "Lasthunt@2014") {
-            window.location.href = "viewData.html"; // Redirect to About page if correct password
+        let pass = prompt("This Page Acess Only AZ MOTOR SPARE:");
+        if (pass === "Lasthunt@2014") {
+            document.getElementById("buttonContainer").style.display = "block";
         } else {
-            alert("Incorrect password. Please try again.");
+            alert("Incorrect Pass!");
         }
     }
- </script>
+</script>
  
 </body>
 </html>
